@@ -64,5 +64,5 @@ func buildSuabCmd(imageTag string, masterUrl string) string {
 
 func SubmibOverHttp(imageTag string, masterUrl string, swarmUri string) error {
 	// TODO
-	return nil
+	return errors.New("Not implemented yet. Please install Docker and make sure it's on the path")
 }
