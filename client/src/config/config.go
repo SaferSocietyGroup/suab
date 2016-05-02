@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"strings"
 	"net/url"
+	"flag"
 )
 
 type MasterUrl struct {
@@ -70,9 +71,9 @@ func stringToSwarmUri(s string) (*SwarmUri, error) {
 }
 
 type Config struct {
-	DockerImageTag string
-	MasterUrl MasterUrl
-	SwarmUri SwarmUri
+	DockerImageTag string `json:"dockerImageTag"`
+	MasterUrl *MasterUrl  `json:"masterUrl"`
+	SwarmUri *SwarmUri    `json:"swarmUri"`
 }
 
 func ReadConfigFile(path string) (*Config, error) {
@@ -93,22 +94,70 @@ func ReadConfigFile(path string) (*Config, error) {
 
 
 func ParseConfigFlags() (*Config, error) {
-/*	app.Flags = []cli.Flag {
-		cli.StringFlag{
-			Name: "docker-image-tag, d",
-			Usage: "Build in the Docker image `TAG` ",
-		},
-		cli.StringFlag{
-			Name: "master, m",
-			Usage: "The url of the suab master. e.g. http://example.com:8080 ",
-		},
-		cli.StringFlag{
-			Name: "swarm, s",
-			Usage: "The uri of the Docker swarm to submit the work to, e.g. example.com:4000 ",
-		},
+	dockerImageTag := flag.String("d", "", "The tag of the Docker image in which to build")
+	masterRaw := flag.String("m", "", "The SUAB masters URL in the form http://example.com:8080")
+	swarmRaw := flag.String("s", "", "The Docker swarm URI in the form example.com:4000")
+
+	flag.Parse()
+
+	var masterUrl *MasterUrl = nil
+	if len(*masterRaw) > 0 {
+		var err error
+		masterUrl, err = stringToMasterUrl(*masterRaw)
+		if err != nil {
+			return nil, errors.New("Unable to parse the master URL. " + err.Error())
+		}
 	}
-*/
 
+	var swarmUri *SwarmUri = nil
+	if len(*swarmRaw) > 0 {
+		var err error
+		swarmUri, err = stringToSwarmUri(*swarmRaw)
+		if err != nil {
+			return nil, errors.New("Unable to parse the swarm URI. " + err.Error())
+		}
+	}
 
-	return nil, nil
+	return &Config{
+		DockerImageTag: *dockerImageTag,
+		MasterUrl: masterUrl,
+		SwarmUri: swarmUri,
+	}, nil
+}
+
+func ReadAndParseEffectiveConf(configFilePath string) (*Config, error){
+	flagsConf, err := ParseConfigFlags()
+	if err != nil {
+		return nil, err
+	}
+
+	if fileExists(configFilePath) {
+		fileConf, err := ReadConfigFile(configFilePath)
+		if err != nil {
+			return nil, err
+		}
+		return merge(flagsConf, fileConf), nil
+	} else {
+		return flagsConf, nil
+	}
+}
+func fileExists(path string) bool {
+	_, err := os.Stat(path);
+	return err == nil
+}
+
+func merge(important *Config, lessImportant *Config) *Config {
+	if len(important.DockerImageTag) == 0 {
+		important.DockerImageTag = lessImportant.DockerImageTag
+	}
+
+	if important.MasterUrl == nil {
+		important.MasterUrl = lessImportant.MasterUrl
+	}
+
+	if important.SwarmUri == nil {
+		important.SwarmUri = lessImportant.SwarmUri
+	}
+
+	return important
 }
