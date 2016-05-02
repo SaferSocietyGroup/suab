@@ -6,5 +6,6 @@ COPY build.sh /bin/run.sh
 RUN mkdir /artifacts
 RUN echo "mv build/* /artifacts" >> /bin/run.sh
 
+ENV GOPATH /src
 WORKDIR /src
 CMD run.sh

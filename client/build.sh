@@ -3,7 +3,7 @@
 set -e
 
 mkdir -p build
-BUILD_CMD="go build -v src/suab.go"
+BUILD_CMD="go build -v suab"
 
 echo "## Compling for linux..."
 GOOS=linux $BUILD_CMD
