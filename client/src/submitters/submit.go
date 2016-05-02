@@ -1,16 +1,30 @@
-package main
+package submitters
 
 import (
+	"os"
 	"fmt"
-	"os/exec"
 	"errors"
 	"strings"
-	"os"
+	"os/exec"
 )
 
-type submitter func(string, string, string) error
+type Submitter func(string, string, string) error
 
-func sumbitDocker(imageTag string, masterUrl string, swarmUri string) error {
+func GetSubmitter() Submitter {
+	var s Submitter = SumbitDocker
+	if !isOnPath("docker") {
+		fmt.Println("docker was not found on the path, using cURL instead")
+		return SubmibOverHttp
+	}
+	return s
+}
+
+func isOnPath(cmd string) bool {
+	_, err := exec.LookPath(cmd);
+	return err == nil
+}
+
+func SumbitDocker(imageTag string, masterUrl string, swarmUri string) error {
 	suabCmd := buildSuabCmd(imageTag, masterUrl)
 
 	cmd := exec.Command("docker", "run", "--entrypoint=/bin/bash", /*"--rm",*/ imageTag, "-c", suabCmd)
@@ -31,7 +45,7 @@ func sumbitDocker(imageTag string, masterUrl string, swarmUri string) error {
 func buildSuabCmd(imageTag string, masterUrl string) string {
 	buildId := "`hostname`"
 	baseUrl := masterUrl+ "/build/" + buildId
-	logFile := "/tmp/run-output" 
+	logFile := "/tmp/run-output"
 
 	tellMasterThatABuildHasStarted := "curl --data '{\"hellur\": \"knivur\"}' " +baseUrl
 	uploadLogs := "curl --data @" +logFile+ " " +baseUrl+ "/logs"
@@ -48,39 +62,7 @@ func buildSuabCmd(imageTag string, masterUrl string) string {
 	return suabCmd
 }
 
-func submibOverHttp(imageTag string, masterUrl string, swarmUri string) error {
+func SubmibOverHttp(imageTag string, masterUrl string, swarmUri string) error {
 	// TODO
 	return nil
-}
-
-func main() {
-	// I want to run suab with no arguments to build the project I'm in
-	// The following three variables should come from a config file 
-	// and be overridable by flags
-
-	dockerImageTag := os.Args[1]//"192.168.10.78:5000/apa"
-	masterUrl := "http://192.168.10.78:8080"
-	swarmUri := "192.168.10.78:4000"
-
-	s := getSubmitter()
-	err := s(dockerImageTag, masterUrl, swarmUri)
-	if err != nil {
-		fmt.Printf("Submission failed. %s\n", err)
-	} else {
-		fmt.Println("Successfully shut up and built")
-	}
-}
-
-func getSubmitter() submitter {
-	var s submitter = sumbitDocker
-	if !isOnPath("docker") {
-		fmt.Println("docker was not found on the path, using cURL instead")
-		return submibOverHttp
-	}
-	return s
-}
-
-func isOnPath(cmd string) bool {
-	_, err := exec.LookPath(cmd);
-	return err == nil
 }
