@@ -4,76 +4,17 @@ import (
 	"os"
 	"encoding/json"
 	"errors"
-	"strconv"
-	"strings"
-	"net/url"
 	"flag"
+	"fmt"
+	"shutupflags"
+	"strings"
 )
 
-type MasterUrl struct {
-	protocol string
-	host string
-	port uint16
-}
-func (a *MasterUrl) ToString() string {
-	return a.protocol + "://" + a.host + ":" + string(a.port)
-}
-func (a *MasterUrl) IsValid() bool {
-	return len(a.protocol) > 0 && len(a.host) > 0 && a.port > 0
-}
-func stringToMasterUrl(s string) (*MasterUrl, error) {
-	url, err := url.Parse(s)
-	if err != nil {
-		return nil, err
-	}
-
-	hostParts, err := stringToSwarmUri(url.Host)
-	if err != nil {
-		return nil, errors.New("The host-port part of the URL must be on the form example.com:8080")
-	}
-
-	return &MasterUrl{
-		protocol: url.Scheme,
-		host: hostParts.host,
-		port: hostParts.port,
-	}, nil
-}
-
-
-type SwarmUri struct {
-	host string
-	port uint16
-}
-func (a *SwarmUri) ToString() string {
-	return a.host + ":" + string(a.port)
-}
-func (a *SwarmUri) IsValid() bool {
-	return len(a.host) > 0 && a.port > 0
-}
-func stringToSwarmUri(s string) (*SwarmUri, error) {
-	parts := strings.Split(s, ":")
-	if len(parts) != 2 {
-		return nil, errors.New("You must specify the swarm uri on the form HOST:PORT")
-	}
-
-	port, err := strconv.Atoi(parts[1])
-	if err != nil {
-		return nil, err
-	}
-	if port < 1 || port > 65535 {
-		return nil, errors.New("Invalid port")
-	}
-
-	return &SwarmUri{
-		host: parts[0],
-		port: uint16(port),
-	}, nil
-}
-
 type Config struct {
-	DockerImageTag string `json:"dockerImageTag"`
-	MasterUrl *MasterUrl  `json:"masterUrl"`
-	SwarmUri *SwarmUri    `json:"swarmUri"`
+	DockerImageTag string         `json:"dockerImageTag"`
+	MasterUrl *MasterUrl          `json:"masterUrl"`
+	SwarmUri *SwarmUri            `json:"swarmUri"`
+	Environment map[string]string `json:"environment"`
 }
 
 func ReadConfigFile(path string) (*Config, error) {
@@ -92,37 +33,100 @@ func ReadConfigFile(path string) (*Config, error) {
 	}
 }
 
-
 func ParseConfigFlags() (*Config, error) {
-	dockerImageTag := flag.String("d", "", "The tag of the Docker image in which to build")
-	masterRaw := flag.String("m", "", "The SUAB masters URL in the form http://example.com:8080")
-	swarmRaw := flag.String("s", "", "The Docker swarm URI in the form example.com:4000")
+	dockerImageTag := shutupflags.AddFlag("-d", "--dockerImageTag", "", "The tag of the Docker image in which to build")
+	masterRaw := shutupflags.AddFlag("-m", "--master", "", "The SUAB masters URL in the form http://example.com:8080")
+	swarmRaw := shutupflags.AddFlag("-s", "--swarm", "", "The Docker swarm URI in the form example.com:4000")
+	envRaw := shutupflags.AddFlag("-e", "--env", "", "Any environment variables you want in the docker image. Passed as --env a=b,c=d")
+
+	flag.Usage = func () {
+		fmt.Println(shutupflags.Usage())
+	}
 
 	flag.Parse()
 
-	var masterUrl *MasterUrl = nil
-	if len(*masterRaw) > 0 {
-		var err error
-		masterUrl, err = stringToMasterUrl(*masterRaw)
+	masterUrl, masterErr := parseMasterUrl(*masterRaw)
+	swarmUri, swarmErr := parseSwarmUri(*swarmRaw)
+	env, envErr := parseEnv(*envRaw)
+
+	errs := make([]string, 0)
+	if masterErr != nil {
+		errs = append(errs, masterErr.Error())
+	}
+	if swarmErr != nil {
+		errs = append(errs, swarmErr.Error())
+	}
+	if envErr != nil {
+		errs = append(errs, envErr.Error())
+	}
+	errorRows := strings.Join(errs, "\n")
+
+	if len(errorRows) > 0 {
+		return nil, errors.New(errorRows)
+	} else {
+		return &Config{
+			DockerImageTag: *dockerImageTag,
+			MasterUrl: masterUrl,
+			SwarmUri: swarmUri,
+			Environment: env,
+		}, nil
+	}
+}
+
+func parseMasterUrl(raw string) (*MasterUrl, error) {
+	if len(raw) > 0 {
+		masterUrl, err := stringToMasterUrl(raw)
 		if err != nil {
 			return nil, errors.New("Unable to parse the master URL. " + err.Error())
 		}
-	}
 
-	var swarmUri *SwarmUri = nil
-	if len(*swarmRaw) > 0 {
+		return masterUrl, nil
+	}
+	return nil, nil
+}
+
+func parseSwarmUri(raw string) (*SwarmUri, error) {
+
+	if len(raw) > 0 {
 		var err error
-		swarmUri, err = stringToSwarmUri(*swarmRaw)
+		swarmUri, err := stringToSwarmUri(raw)
 		if err != nil {
 			return nil, errors.New("Unable to parse the swarm URI. " + err.Error())
 		}
+		return swarmUri, nil
+	}
+	return nil, nil
+}
+
+func parseEnv(raw string) (map[string]string, error) {
+	if len(raw) > 0 {
+		env, err := stringToEnv(raw)
+
+		if err != nil {
+			return nil, err
+		} else if len(env) == 0 {
+			// there was some attempt to set env vars, but we got none...
+			return nil, errors.New("Failed to parse the environment flag")
+		}
+		return env, nil
+	}
+	return nil, nil
+}
+
+func stringToEnv(raw string) (map[string]string, error) {
+	parts := strings.Split(raw, ",")
+
+	toReturn := make(map[string]string)
+	for _, rawEnv := range parts {
+		envParts := strings.Split(rawEnv, "=")
+		if len(envParts) != 2 {
+			return nil, errors.New("The environment variables seem malformed, see " + rawEnv)
+		}
+		// The following overwrites vars if they're specified more than once. Is that good?
+		toReturn[envParts[0]] = envParts[1]
 	}
 
-	return &Config{
-		DockerImageTag: *dockerImageTag,
-		MasterUrl: masterUrl,
-		SwarmUri: swarmUri,
-	}, nil
+	return toReturn, nil
 }
 
 func ReadAndParseEffectiveConf(configFilePath string) (*Config, error){

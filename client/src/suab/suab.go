@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	configFilePath := "./.suab-config"
+	configFilePath := "./.suab.json"
 	conf, err := config.ReadAndParseEffectiveConf(configFilePath);
 	if err != nil {
 		fmt.Printf("%+v\n", err)
@@ -18,11 +18,12 @@ func main() {
 
 	if errs := validate(conf, configFilePath); len(errs) > 0  {
 		fmt.Printf("Invalid config.\n  %s\n", strings.Join(errs, "\n  "))
+		fmt.Println("\nUse the -h flag for more help")
 		os.Exit(2)
 	}
 
 	submitter := submitters.GetSubmitter()
-	err = submitter(conf.DockerImageTag, conf.MasterUrl.ToString(), conf.SwarmUri.ToString())
+	err = submitter(conf.DockerImageTag, conf.MasterUrl.ToString(), conf.SwarmUri.ToString(), conf.Environment)
 	if err == nil {
 		fmt.Println("Successfully shut up and built!")
 	} else {
@@ -42,7 +43,7 @@ func validate(conf *config.Config, configFile string) []string {
 	}
 
 	if conf.SwarmUri == nil || !conf.SwarmUri.IsValid() {
-		errs = append(errs, "You must specify a valid docker swarm uri, either via the -d flag, or via the \"swarmUri\": \"example.com:4000\" in " + configFile)
+		errs = append(errs, "You must specify a valid docker swarm uri, either via the -s flag, or via the \"swarmUri\": \"example.com:4000\" in " + configFile)
 	}
 
 	return errs

@@ -8,7 +8,7 @@ import (
 	"os/exec"
 )
 
-type Submitter func(string, string, string) error
+type Submitter func(string, string, string, map[string] string) error
 
 func GetSubmitter() Submitter {
 	var s Submitter = SumbitDocker
@@ -24,10 +24,14 @@ func isOnPath(cmd string) bool {
 	return err == nil
 }
 
-func SumbitDocker(imageTag string, masterUrl string, swarmUri string) error {
+func SumbitDocker(imageTag string, masterUrl string, swarmUri string, env map[string]string) error {
 	suabCmd := buildSuabCmd(imageTag, masterUrl)
 
-	cmd := exec.Command("docker", "run", "--entrypoint=/bin/bash", /*"--rm",*/ imageTag, "-c", suabCmd)
+	cmd := exec.Command("docker", "run")
+	cmd.Args = append(cmd.Args, "--entrypoint=/bin/bash")
+	cmd.Args = appendEnv(cmd.Args, env)
+	cmd.Args = append(cmd.Args, imageTag, "-c", suabCmd)
+
 	cmd.Env = []string{"DOCKER_HOST=" + swarmUri}
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
@@ -40,6 +44,12 @@ func SumbitDocker(imageTag string, masterUrl string, swarmUri string) error {
 	}
 
 	return nil
+}
+func appendEnv(args []string, env map[string]string) []string {
+	for key, value := range env {
+		args = append(args, "--env" ,key +"="+value)
+	}
+	return args
 }
 
 func buildSuabCmd(imageTag string, masterUrl string) string {
@@ -62,7 +72,7 @@ func buildSuabCmd(imageTag string, masterUrl string) string {
 	return suabCmd
 }
 
-func SubmibOverHttp(imageTag string, masterUrl string, swarmUri string) error {
+func SubmibOverHttp(imageTag string, masterUrl string, swarmUri string, env map[string]string) error {
 	// TODO
 	return errors.New("Not implemented yet. Please install Docker and make sure it's on the path")
 }
