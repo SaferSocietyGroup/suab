@@ -163,5 +163,10 @@ func merge(important *Config, lessImportant *Config) *Config {
 		important.SwarmUri = lessImportant.SwarmUri
 	}
 
+	if important.Environment == nil {
+		// TODO: Should be done on a var-per-var basis? Either --env overwrites all vars, or it appends new and overwrites some.
+		important.Environment = lessImportant.Environment
+	}
+
 	return important
 }

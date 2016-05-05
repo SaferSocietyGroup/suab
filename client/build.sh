@@ -2,17 +2,17 @@
 
 set -e
 
-mkdir -p build
 BUILD_CMD="go build -v suab"
 
-DIRNAME=`dirname $0`
-WD=`readlink -nf $DIRNAME`
+READPATH=`readlink -nf $0`
+WD=`dirname $READPATH`
 export GOPATH=$WD
+mkdir -p "${WD}/build"
 
 function build {
   echo "## Compling for $1..."
   GOOS=$1 $BUILD_CMD
-  mv -f suab* build/
+  mv -f suab* "${WD}/build"
   echo "## Done"
 }
 

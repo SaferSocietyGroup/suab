@@ -11,7 +11,7 @@ from the client folder and a linux and windows binary will be built and put in t
 
 You can also build it in docker by running
 ```
-docker build --tag=suab-client-build
-docker run -it --rm -v `pwd`:/src -v `pwd`/build:/artifacts suab-client-build
+docker build --tag=suab-client-build .
+docker run --rm -v `pwd`:/src suab-client-build
 ```
 from the client folder
