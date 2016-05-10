@@ -9,6 +9,10 @@ import (
 )
 
 func main() {
+	// TODO: suab list, list all builds
+	// TODO: suab logs BUILD_ID, show the logs from the build BUILD_ID
+
+
 	configFilePath := "./.suab.json"
 	conf, err := config.ReadAndParseEffectiveConf(configFilePath);
 	if err != nil {

@@ -11,10 +11,10 @@ import (
 type Submitter func(string, string, string, map[string] string) error
 
 func GetSubmitter() Submitter {
-	var s Submitter = SumbitDocker
+	var s Submitter = SubmitDocker
 	if !isOnPath("docker") {
 		fmt.Println("docker was not found on the path, using cURL instead")
-		return SubmibOverHttp
+		return SubmitOverHttp
 	}
 	return s
 }
@@ -24,7 +24,7 @@ func isOnPath(cmd string) bool {
 	return err == nil
 }
 
-func SumbitDocker(imageTag string, masterUrl string, swarmUri string, env map[string]string) error {
+func SubmitDocker(imageTag string, masterUrl string, swarmUri string, env map[string]string) error {
 	suabCmd := buildSuabCmd(imageTag, masterUrl)
 
 	cmd := exec.Command("docker", "run")
@@ -57,22 +57,20 @@ func buildSuabCmd(imageTag string, masterUrl string) string {
 	baseUrl := masterUrl+ "/build/" + buildId
 	logFile := "/tmp/run-output"
 
-	tellMasterThatABuildHasStarted := "curl --data '{\"hellur\": \"knivur\"}' " +baseUrl
+	echoBuildId := "echo \"BuildId: " + buildId + "\""
+	tellMasterThatABuildHasStarted := "curl --data '{\"image\": \"" +imageTag+ "\"}' " +baseUrl
+	checkoutCode := "checkout-code.sh"
+	run := "run.sh 2>&1 | tee " + logFile
 	uploadLogs := "curl --data @" +logFile+ " " +baseUrl+ "/logs"
 	uploadArtifacts := "test -d /artifacts && find /artifacts -type f -exec curl -X POST --data-binary @{} " +baseUrl+ "{} \\;"
 
-	suabCmd := strings.Join([]string{
-		"echo \"BuildId: " + buildId + "\"",
-		tellMasterThatABuildHasStarted + " ; " +
-		"checkout-code.sh", // TODO: We need arguments to the checkout-code.sh script. The hash to checkout e.g.
-		"run.sh 2>&1 | tee " + logFile,
-		uploadLogs + " ; " + // TODO: The logs should be streamed to the server, not uploaded once it's all done
-		uploadArtifacts,
-	}, " && ")
+	suabCmd := echoBuildId + " ; " + tellMasterThatABuildHasStarted + " ; " + checkoutCode + " && "
+		 + run + " && "
+	         + uploadLogs + " ; " + uploadArtifacts // TODO: The logs should be streamed to the server, not uploaded once it's all done
 	return suabCmd
 }
 
-func SubmibOverHttp(imageTag string, masterUrl string, swarmUri string, env map[string]string) error {
+func SubmitOverHttp(imageTag string, masterUrl string, swarmUri string, env map[string]string) error {
 	// TODO
 	return errors.New("Not implemented yet. Please install Docker and make sure it's on the path")
 }
