@@ -13,7 +13,7 @@ No more *"I have to wait for these gazillion other builds to finish before I can
 
 A gif of this in action is coming up!
 
-No, but really it's easy. Suab expects six things from your docker image
+No, but really. It's easy. Suab expects six things from your docker image
 
 1. `curl` is on the path
 2. `find` is on the path
@@ -30,7 +30,7 @@ There are many examples [here](https://github.com/SaferSocietyGroup/suab/blob/ma
 3. run `docker-compose up -d -f THE-FILE-FROM-STEP-2`
 
 ## Building from source
-Just run `client/build.sh` or `server/build.sh` and linux and windows binary will be built and put in the `build` folder of the corresponding projects.
+Just run `client/build.sh` or `server/build.sh` and linux and windows binaries will be built and put in the `build` folder of the corresponding projects.
 
 You can also build in docker by running
 ```
