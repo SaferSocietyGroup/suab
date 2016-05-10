@@ -4,7 +4,6 @@ import (
 	"os"
 	"fmt"
 	"errors"
-	"strings"
 	"os/exec"
 )
 
@@ -65,8 +64,8 @@ func buildSuabCmd(imageTag string, masterUrl string) string {
 	uploadArtifacts := "test -d /artifacts && find /artifacts -type f -exec curl -X POST --data-binary @{} " +baseUrl+ "{} \\;"
 
 	suabCmd := echoBuildId + " ; " + tellMasterThatABuildHasStarted + " ; " + checkoutCode + " && "
-		 + run + " && "
-	         + uploadLogs + " ; " + uploadArtifacts // TODO: The logs should be streamed to the server, not uploaded once it's all done
+	suabCmd += run + " && "
+	suabCmd += uploadLogs + " ; " + uploadArtifacts // TODO: The logs should be streamed to the server, not uploaded once it's all done
 	return suabCmd
 }
 
