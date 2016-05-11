@@ -52,18 +52,19 @@ func appendEnv(args []string, env map[string]string) []string {
 }
 
 func buildSuabCmd(imageTag string, masterUrl string) string {
-	buildId := "`hostname`"
-	baseUrl := masterUrl+ "/build/" + buildId
+	exportBuildId := "export SUAB_BUILD_ID=`hostname`"
+	baseUrl := masterUrl+ "/build/$SUAB_BUILD_ID"
 	logFile := "/tmp/run-output"
 
-	echoBuildId := "echo \"BuildId: " + buildId + "\""
+	echoBuildId := "echo \"BuildId: $SUAB_BUILD_ID\""
 	tellMasterThatABuildHasStarted := "curl --data '{\"image\": \"" +imageTag+ "\"}' " +baseUrl
 	checkoutCode := "checkout-code.sh"
 	run := "run.sh 2>&1 | tee " + logFile
 	uploadLogs := "curl --data @" +logFile+ " " +baseUrl+ "/logs"
 	uploadArtifacts := "test -d /artifacts && find /artifacts -type f -exec curl -X POST --data-binary @{} " +baseUrl+ "{} \\;"
 
-	suabCmd := echoBuildId + " ; " + tellMasterThatABuildHasStarted + " ; " + checkoutCode + " && "
+	suabCmd := exportBuildId + " && "
+	suabCmd += echoBuildId + " ; " + tellMasterThatABuildHasStarted + " ; " + checkoutCode + " && "
 	suabCmd += run + " && "
 	suabCmd += uploadLogs + " ; " + uploadArtifacts // TODO: The logs should be streamed to the server, not uploaded once it's all done
 	return suabCmd
