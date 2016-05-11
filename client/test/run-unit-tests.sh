@@ -1,6 +1,6 @@
 DIRNAME=`dirname $0`
-WD=`readlink -nf $DIRNAME`
-export GOPATH=$WD 
+WD=`readlink -nf ../$DIRNAME`
+export GOPATH=$WD
 
 go test suab
 go test config
