@@ -16,7 +16,7 @@ A gif of this in action is coming up!
 No, but really. It's easy. Suab expects six things from your docker image
 
 1. `curl` is on the path
-2. `find` is on the path
+2. `find` and `test` is on the path
 3. a `checkout-code.sh` script on the path. This is where you get your code into the docker image. An example of this script can be found [here](https://github.com/SaferSocietyGroup/suab/blob/master/client/clone.sh).
 4. a `run.sh` script on the path that actually builds your stuff.
 5. all logs are printed to stdout or stderr
