@@ -3,7 +3,7 @@ window.Root = React.createClass({
     getInitialState: function() {
         return {
             builds: [],
-            content: "Choose a build to the right",
+            content: "Choose a build to the left",
         };
     },
 
@@ -20,7 +20,7 @@ window.Root = React.createClass({
 
     navigateToBuild: function(buildId) {
         console.log("Navigating to", buildId);
-        this.setState({contet: <Build id={buildId}/>});
+        this.setState({content: <Build buildId={buildId}/>});
     },
 
     render: function() {
@@ -33,10 +33,10 @@ window.Root = React.createClass({
         }
 
         return <div>
-            <div style={{float: "left"}}>
+            <div>
                 {menu}
             </div>
-            <div style={{float: "left"}}>
+            <div style={{padding: "10px"}}>
                 {this.state.content}
             </div>
         </div>
