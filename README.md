@@ -38,7 +38,7 @@ docker run --rm -v `pwd`:/src suab-client-build client/build.sh
 ```
 and
 ```
-docker build --tag=suab-server-build server
+docker build --tag=suab-server-build -f server/build.dockerfile server
 docker run --rm -v `pwd`:/src suab-server-build server/build.sh
 ```
 from the git root folder. The compiled binaries are now in `client/build` and `server/build`.
