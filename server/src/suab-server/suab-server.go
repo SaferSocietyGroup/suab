@@ -212,7 +212,15 @@ func ListArtifacts(c *gin.Context) {
         return
     }
 
-    files, err := ioutil.ReadDir("builds/"+buildId+"/artifacts")
+
+    // TODO: Make sure builds/buildId exists
+    artifactsDir := "builds/"+buildId+"/artifacts"
+    if _, err := os.Stat(artifactsDir); os.IsNotExist(err) {
+        c.JSON(200, make([]string, 0))
+        return
+    }
+
+    files, err := ioutil.ReadDir(artifactsDir)
     if err != nil {
         log.Printf("Could not read artifact folder for build %s, %s\n", buildId, err)
         c.String(500, "Could not read artifact folder for build %s, %s", buildId, err)
