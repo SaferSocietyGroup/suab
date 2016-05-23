@@ -12,8 +12,8 @@ import (
 
 type Config struct {
 	DockerImageTag string         `json:"dockerImageTag"`
-	MasterUrl *MasterUrl          `json:"masterUrl"`
-	SwarmUri *SwarmUri            `json:"swarmUri"`
+	MasterUrl string              `json:"masterUrl"`
+	SwarmUri string               `json:"swarmUri"`
 	Environment map[string]string `json:"environment"`
 }
 
@@ -35,8 +35,8 @@ func ReadConfigFile(path string) (*Config, error) {
 
 func ParseConfigFlags() (*Config, error) {
 	dockerImageTag := shutupflags.AddFlag("-d", "--dockerImageTag", "", "The tag of the Docker image in which to build")
-	masterRaw := shutupflags.AddFlag("-m", "--master", "", "The SUAB masters URL in the form http://example.com:8080")
-	swarmRaw := shutupflags.AddFlag("-s", "--swarm", "", "The Docker swarm URI in the form example.com:4000")
+	masterUrl := shutupflags.AddFlag("-m", "--master", "", "The SUAB masters URL in the form http://example.com:8080")
+	swarmUri := shutupflags.AddFlag("-s", "--swarm", "", "The Docker swarm URI in the form example.com:4000")
 	envRaw := shutupflags.AddFlag("-e", "--env", "", "Any environment variables you want in the docker image. Passed as --env a=b,c=d")
 
 	flag.Usage = func () {
@@ -45,17 +45,9 @@ func ParseConfigFlags() (*Config, error) {
 
 	flag.Parse()
 
-	masterUrl, masterErr := parseMasterUrl(*masterRaw)
-	swarmUri, swarmErr := parseSwarmUri(*swarmRaw)
 	env, envErr := parseEnv(*envRaw)
 
 	errs := make([]string, 0)
-	if masterErr != nil {
-		errs = append(errs, masterErr.Error())
-	}
-	if swarmErr != nil {
-		errs = append(errs, swarmErr.Error())
-	}
 	if envErr != nil {
 		errs = append(errs, envErr.Error())
 	}
@@ -66,36 +58,11 @@ func ParseConfigFlags() (*Config, error) {
 	} else {
 		return &Config{
 			DockerImageTag: *dockerImageTag,
-			MasterUrl: masterUrl,
-			SwarmUri: swarmUri,
+			MasterUrl: *masterUrl,
+			SwarmUri: *swarmUri,
 			Environment: env,
 		}, nil
 	}
-}
-
-func parseMasterUrl(raw string) (*MasterUrl, error) {
-	if len(raw) > 0 {
-		masterUrl, err := stringToMasterUrl(raw)
-		if err != nil {
-			return nil, errors.New("Unable to parse the master URL. " + err.Error())
-		}
-
-		return masterUrl, nil
-	}
-	return nil, nil
-}
-
-func parseSwarmUri(raw string) (*SwarmUri, error) {
-
-	if len(raw) > 0 {
-		var err error
-		swarmUri, err := stringToSwarmUri(raw)
-		if err != nil {
-			return nil, errors.New("Unable to parse the swarm URI. " + err.Error())
-		}
-		return swarmUri, nil
-	}
-	return nil, nil
 }
 
 func parseEnv(raw string) (map[string]string, error) {
@@ -155,11 +122,11 @@ func merge(important *Config, lessImportant *Config) *Config {
 		important.DockerImageTag = lessImportant.DockerImageTag
 	}
 
-	if important.MasterUrl == nil {
+	if important.MasterUrl == "" {
 		important.MasterUrl = lessImportant.MasterUrl
 	}
 
-	if important.SwarmUri == nil {
+	if important.SwarmUri == "" {
 		important.SwarmUri = lessImportant.SwarmUri
 	}
 

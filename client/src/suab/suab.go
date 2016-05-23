@@ -27,7 +27,7 @@ func main() {
 	}
 
 	submitter := submitters.GetSubmitter()
-	err = submitter(conf.DockerImageTag, conf.MasterUrl.ToString(), conf.SwarmUri.ToString(), conf.Environment)
+	err = submitter(conf.DockerImageTag, conf.MasterUrl, conf.SwarmUri, conf.Environment)
 	if err == nil {
 		fmt.Println("Successfully shut up and built!")
 	} else {
@@ -42,11 +42,11 @@ func validate(conf *config.Config, configFile string) []string {
 		errs = append(errs, "You must specify a docker image tag, either via the -d flag, or via the \"dockerImageTag\": \"some-tag\" in " + configFile)
 	}
 
-	if conf.MasterUrl == nil || !conf.MasterUrl.IsValid() {
+	if conf.MasterUrl == "" {
 		errs = append(errs, "You must specify a valid master url, either via the -m flag, or via the \"masterUrl\": \"http://example.com:8080\" in " + configFile)
 	}
 
-	if conf.SwarmUri == nil || !conf.SwarmUri.IsValid() {
+	if conf.SwarmUri == "" {
 		errs = append(errs, "You must specify a valid docker swarm uri, either via the -s flag, or via the \"swarmUri\": \"example.com:4000\" in " + configFile)
 	}
 
