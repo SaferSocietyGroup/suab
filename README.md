@@ -25,9 +25,8 @@ No, but really. It's easy. Suab expects six things from your docker image
 There are many examples [here](https://github.com/SaferSocietyGroup/suab/blob/master/examples).
 
 ## Installing the server
-1. install [docker-compose](https://docs.docker.com/compose/install)
-2. download [this docker-compose file](https://github.com/SaferSocietyGroup/suab/blob/master/server/server-compose.yml)
-3. run `docker-compose up -d -f THE-FILE-FROM-STEP-2`
+1. Have a docker daemon running somewhere. We suggest using a swarm, but your local deamon works fine!
+2. Run `docker run -d -p 8080:8080 eriklarko/suab-server`
 
 ## Building from source
 Just run `client/build.sh` or `server/build.sh` and linux and windows binaries will be built and put in the `build` folder of the corresponding projects.
