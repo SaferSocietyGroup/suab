@@ -61,7 +61,7 @@ func buildSuabCmd(imageTag string, masterUrl string) string {
 	echoBuildId := "echo \"BuildId: $SUAB_BUILD_ID\""
 	tellMasterThatABuildHasStarted := "curl --data '{\"image\": \"" +imageTag+ "\"}' " +baseUrl // TODO: Find what flags to use to only output things if it fails
 	checkoutCode := "checkout-code.sh 2>&1 | tee " + logFile
-	run := "run.sh 2>&1 | tee --apend " + logFile
+	run := "run.sh 2>&1 | tee --append " + logFile
 	uploadLogs := "curl --data @" +logFile+ " " +baseUrl+ "/logs"
 	uploadArtifacts := "test -d /artifacts && find /artifacts -type f -exec curl -X POST --data-binary @{} " +baseUrl+ "{} \\;"
 	exitWithTheExitCodeFromRun := "exit 0" // TODO: Read the real exit code and exit with this.
