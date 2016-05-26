@@ -5,9 +5,10 @@ import (
 	"fmt"
 	"errors"
 	"os/exec"
+	"syscall"
 )
 
-type Submitter func(string, string, string, map[string] string) error
+type Submitter func(string, string, string, map[string] string) (int, error)
 
 func GetSubmitter() Submitter {
 	var s Submitter = SubmitDocker
@@ -23,7 +24,7 @@ func isOnPath(cmd string) bool {
 	return err == nil
 }
 
-func SubmitDocker(imageTag string, masterUrl string, swarmUri string, env map[string]string) error {
+func SubmitDocker(imageTag string, masterUrl string, swarmUri string, env map[string]string) (int, error) {
 	suabCmd := buildSuabCmd(imageTag, masterUrl)
 
 	cmd := exec.Command("docker", "run")
@@ -39,13 +40,17 @@ func SubmitDocker(imageTag string, masterUrl string, swarmUri string, env map[st
 
 	fmt.Printf("Submitting image %s to %s. Posting the results to %s\n", imageTag, swarmUri, masterUrl)
 	err := cmd.Run()
-	if err != nil {
-		s := fmt.Sprintf("Could not submit over docker. %s\n", err)
-		return errors.New(s)
-	}
 
-	return nil
+
+	if err == nil {
+		// All was good!
+		return 0, nil
+	} else {
+		// Something went wrong when executing the docker command. Let's try to find out what
+		return tryToFindExitCode(err)
+	}
 }
+
 func appendEnv(args []string, env map[string]string) []string {
 	for key, value := range env {
 		args = append(args, "--env" ,key +"="+value)
@@ -74,7 +79,29 @@ func buildSuabCmd(imageTag string, masterUrl string) string {
 	return suabCmd
 }
 
-func SubmitOverHttp(imageTag string, masterUrl string, swarmUri string, env map[string]string) error {
+func tryToFindExitCode(err error) (int, error) {
+	// Is the error an exec.ExitError?
+	if exiterr, ok := err.(*exec.ExitError); ok {
+		// Yes! This implies that the command exited with a non-zero exit code
+
+		if status, ok := exiterr.Sys().(syscall.WaitStatus); ok {
+			// We found the exit code!
+
+			return status.ExitStatus(), nil
+		} else {
+			// The error was caused by the command exiting with a non-zero code, but we don't
+			// know how to find this code..
+			return 0, errors.New("The command exited with a non-zero code but we can't find out which one")
+		}
+	} else {
+		// err was not an exec.ExitError, this might be a problem setting up the command
+
+		s := fmt.Sprintf("Failed to run the command. %s\n", err)
+		return 0, errors.New(s)
+	}
+}
+
+func SubmitOverHttp(imageTag string, masterUrl string, swarmUri string, env map[string]string) (int, error) {
 	// TODO
-	return errors.New("Not implemented yet. Please install Docker and make sure it's on the path")
+	return 0, errors.New("Not implemented yet. Please install Docker and make sure it's on the path")
 }

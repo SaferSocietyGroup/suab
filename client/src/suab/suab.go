@@ -27,9 +27,14 @@ func main() {
 	}
 
 	submitter := submitters.GetSubmitter()
-	err = submitter(conf.DockerImageTag, conf.MasterUrl, conf.SwarmUri, conf.Environment)
+	exitCode, err := submitter(conf.DockerImageTag, conf.MasterUrl, conf.SwarmUri, conf.Environment)
 	if err == nil {
-		fmt.Println("Successfully shut up and built!")
+		if exitCode == 0 {
+			fmt.Println("Successfully shut up and built!")
+		} else {
+			// Exit with the same exit code as the submitter
+			os.Exit(exitCode)
+		}
 	} else {
 		fmt.Printf("Submission failed. %s\n", err)
 	}
