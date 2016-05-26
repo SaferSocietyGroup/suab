@@ -16,7 +16,10 @@ function build {
   echo "## Done"
 }
 
+# Generate assets
+bin/go-bindata -o src/suab/assets.go src/asssets/...
 
+# Compile
 build linux
 echo
 build windows

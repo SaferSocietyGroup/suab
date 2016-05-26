@@ -12,8 +12,31 @@ func main() {
 	// TODO: suab list, list all builds
 	// TODO: suab logs BUILD_ID, show the logs from the build BUILD_ID
 
+	conf := getAndValidateConfigOrExit("./.suab.json")
+	suabShellScript, err := getSuabShellScript()
+	if err != nil {
+		fmt.Printf("Could not extract the script to run in the docker container, %v\n", err)
+		os.Exit(3)
+	}
+	baseUrl := conf.MasterUrl + "/build/$SUAB_BUILD_ID"
+	suabShellScript = injectVariables(suabShellScript, baseUrl, conf.DockerImageTag)
 
-	configFilePath := "./.suab.json"
+	submitter := submitters.GetSubmitter()
+	exitCode, err := submitter(suabShellScript, conf.DockerImageTag, conf.MasterUrl, conf.SwarmUri, conf.Environment)
+	if err == nil {
+		if exitCode == 0 {
+			fmt.Println("Successfully shut up and built!")
+		} else {
+			// Exit with the same exit code as the submitter
+			os.Exit(exitCode)
+		}
+	} else {
+		fmt.Printf("Submission failed. %s\n", err)
+	}
+}
+
+func getAndValidateConfigOrExit(configFilePath string) *config.Config {
+
 	conf, err := config.ReadAndParseEffectiveConf(configFilePath);
 	if err != nil {
 		fmt.Printf("%+v\n", err)
@@ -26,18 +49,7 @@ func main() {
 		os.Exit(2)
 	}
 
-	submitter := submitters.GetSubmitter()
-	exitCode, err := submitter(conf.DockerImageTag, conf.MasterUrl, conf.SwarmUri, conf.Environment)
-	if err == nil {
-		if exitCode == 0 {
-			fmt.Println("Successfully shut up and built!")
-		} else {
-			// Exit with the same exit code as the submitter
-			os.Exit(exitCode)
-		}
-	} else {
-		fmt.Printf("Submission failed. %s\n", err)
-	}
+	return conf
 }
 
 func validate(conf *config.Config, configFile string) []string {
@@ -58,4 +70,18 @@ func validate(conf *config.Config, configFile string) []string {
 	return errs
 }
 
+func getSuabShellScript() (string, error) {
+	data, err := Asset("src/asssets/docker-cmd.sh")
+	if err != nil {
+		return "", err
+	}
+	return string(data), nil
+}
+
+func injectVariables(script string, baseUrl string, imageTag string) string {
+	script = strings.Replace(script, "$1", baseUrl, 1)
+	script = strings.Replace(script, "$2", imageTag, 1)
+
+	return script
+}
 

@@ -6,9 +6,12 @@ import (
 	"errors"
 	"os/exec"
 	"syscall"
+	"strings"
+	"regexp"
+	"bytes"
 )
 
-type Submitter func(string, string, string, map[string] string) (int, error)
+type Submitter func(string, string, string, string, map[string] string) (int, error)
 
 func GetSubmitter() Submitter {
 	var s Submitter = SubmitDocker
@@ -24,8 +27,8 @@ func isOnPath(cmd string) bool {
 	return err == nil
 }
 
-func SubmitDocker(imageTag string, masterUrl string, swarmUri string, env map[string]string) (int, error) {
-	suabCmd := buildSuabCmd(imageTag, masterUrl)
+func SubmitDocker(suabShellScript string, imageTag string, masterUrl string, swarmUri string, env map[string]string) (int, error) {
+	suabCmd := collapseToOneLine(suabShellScript)
 
 	cmd := exec.Command("docker", "run")
 	cmd.Args = append(cmd.Args, "--entrypoint=/bin/bash")
@@ -41,7 +44,6 @@ func SubmitDocker(imageTag string, masterUrl string, swarmUri string, env map[st
 	fmt.Printf("Submitting image %s to %s. Posting the results to %s\n", imageTag, swarmUri, masterUrl)
 	err := cmd.Run()
 
-
 	if err == nil {
 		// All was good!
 		return 0, nil
@@ -51,32 +53,31 @@ func SubmitDocker(imageTag string, masterUrl string, swarmUri string, env map[st
 	}
 }
 
+func collapseToOneLine(script string) string {
+	commentsRegex := regexp.MustCompile("#.*")
+	var buffer bytes.Buffer
+
+	lines := strings.Split(script, "\n")
+	for i, line := range lines {
+		lineWithoutComments := commentsRegex.ReplaceAllString(line, "")
+		trimmedLine := strings.TrimSpace(lineWithoutComments)
+
+		if len(trimmedLine) > 0 {
+			buffer.WriteString(line)
+
+			if i < len(lines) -1 && line != "(" {
+				buffer.WriteString(";")
+			}
+		}
+	}
+	return buffer.String()
+}
+
 func appendEnv(args []string, env map[string]string) []string {
 	for key, value := range env {
 		args = append(args, "--env" ,key +"="+value)
 	}
 	return args
-}
-
-func buildSuabCmd(imageTag string, masterUrl string) string {
-	exportBuildId := "export SUAB_BUILD_ID=`hostname`"
-	baseUrl := masterUrl+ "/build/$SUAB_BUILD_ID"
-	logFile := "/tmp/run-output"
-
-	echoBuildId := "echo \"BuildId: $SUAB_BUILD_ID\""
-	tellMasterThatABuildHasStarted := "curl --data '{\"image\": \"" +imageTag+ "\"}' " +baseUrl // TODO: Find what flags to use to only output things if it fails
-	checkoutCode := "checkout-code.sh 2>&1 | tee " + logFile
-	run := "run.sh 2>&1 | tee --append " + logFile
-	uploadLogs := "curl --data @" +logFile+ " " +baseUrl+ "/logs"
-	uploadArtifacts := "test -d /artifacts && find /artifacts -type f -exec curl -X POST --data-binary @{} " +baseUrl+ "{} \\;"
-	exitWithTheExitCodeFromRun := "exit 0" // TODO: Read the real exit code and exit with this.
-
-	suabCmd := exportBuildId
-	suabCmd += " && " + echoBuildId + " ; " + tellMasterThatABuildHasStarted + " ; " + checkoutCode
-	suabCmd += " && " + run
-	suabCmd += " && " + uploadLogs + " ; " + uploadArtifacts // TODO: The logs should be streamed to the server, not uploaded once it's all done
-	suabCmd += " && " + exitWithTheExitCodeFromRun // TODO: If the uploads fail, which exit code do we want to use then? If run.sh was ok, then the uploads? Otherwise, let the run.sh trump?
-	return suabCmd
 }
 
 func tryToFindExitCode(err error) (int, error) {
@@ -101,7 +102,7 @@ func tryToFindExitCode(err error) (int, error) {
 	}
 }
 
-func SubmitOverHttp(imageTag string, masterUrl string, swarmUri string, env map[string]string) (int, error) {
+func SubmitOverHttp(suabCmd string, imageTag string, masterUrl string, swarmUri string, env map[string]string) (int, error) {
 	// TODO
 	return 0, errors.New("Not implemented yet. Please install Docker and make sure it's on the path")
 }
