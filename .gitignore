@@ -1,3 +1,5 @@
 *.swp
 .idea
 build
+builds
+node_modules
