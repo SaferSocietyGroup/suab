@@ -16,6 +16,11 @@ function build {
   echo "## Done"
 }
 
+# Generate assets
+PATH=$PATH:"./bin"
+go-bindata-assetfs ../web-ui/... ../client/build/...
+mv bindata_assetfs.go src/suab-server/assetfs.go
+
 build linux
 echo
 build windows

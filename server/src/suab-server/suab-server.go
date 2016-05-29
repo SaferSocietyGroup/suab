@@ -9,6 +9,7 @@ import (
     "encoding/json"
     "errors"
     "log"
+    "net/http"
 )
 
 type Build struct {
@@ -20,6 +21,8 @@ type Build struct {
 }
 
 func main() {
+    var fileServer http.Handler = http.FileServer(assetFS())
+
     r := gin.Default()
     r.Use(CORSMiddleware())
 
@@ -36,6 +39,9 @@ func main() {
     r.POST("/build/:buildId/artifacts/:artifactId", WriteArtifact)
     r.GET("/build/:buildId/artifacts/:artifactId", GetArtifact)
     r.GET("/build/:buildId/artifacts", ListArtifacts)
+
+    setupWebUiEndpoints(r, fileServer)
+    setupClientDownloads(r, fileServer)
 
     r.Run() // listen and server on 0.0.0.0:8080
 }
@@ -54,6 +60,29 @@ func CORSMiddleware() gin.HandlerFunc {
 
         c.Next()
     }
+}
+
+func setupWebUiEndpoints(r *gin.Engine, fileServer http.Handler) {
+    r.GET("/", func(c *gin.Context) {
+        c.Redirect(301, "/web-ui")
+    })
+    r.Any("/web-ui/*any", func(c *gin.Context) {
+        fileServer.ServeHTTP(c.Writer, c.Request)
+    })
+
+}
+
+func setupClientDownloads(r *gin.Engine, fileServer http.Handler) {
+    r.GET("/client/linux", func(c *gin.Context) {
+        c.Redirect(301, "/client/build/suab")
+    })
+    r.GET("/client/win", func(c *gin.Context) {
+        c.Redirect(301, "/client/build/suab.exe")
+    })
+    r.GET("/client/build/*any", func(c *gin.Context) {
+        fileServer.ServeHTTP(c.Writer, c.Request)
+    })
+
 }
 
 func CreateBuild(c *gin.Context) {
