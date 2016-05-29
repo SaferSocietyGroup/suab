@@ -142,7 +142,12 @@ func GetBuildMetadata(c *gin.Context) {
 }
 
 func ListBuilds(c *gin.Context) {
-    files, err := ioutil.ReadDir("builds")
+    if _, err := os.Stat(buildDir); os.IsNotExist(err) {
+        c.JSON(200, make([]interface{}, 0))
+        return
+    }
+
+    files, err := ioutil.ReadDir(buildDir)
     if err != nil {
         log.Printf("Unable to list builds %s\n", err)
         c.String(500, "Failed listing builds %s", err)
