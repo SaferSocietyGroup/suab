@@ -10,6 +10,7 @@ import (
     "errors"
     "log"
     "net/http"
+    "path"
 )
 
 type Build struct {
@@ -19,6 +20,8 @@ type Build struct {
     EnvVars map[string]string
     Logs string
 }
+
+var buildDir string = "builds"
 
 func main() {
     var fileServer http.Handler = http.FileServer(assetFS())
@@ -92,17 +95,17 @@ func CreateBuild(c *gin.Context) {
         return
     }
 
-    err := os.RemoveAll("builds/" + buildId)
+    err := os.RemoveAll(path.Join(buildDir, buildId))
     if err != nil {
         log.Printf("Unable to clean the build directory for build %s, %s\n", err, buildId)
     }
-    err = os.MkdirAll("builds/" + buildId, 0777)
+    err = os.MkdirAll(path.Join(buildDir, buildId), 0777)
     if err != nil {
         log.Printf("Unable to create build directory for build %s, %s\n", buildId, err.Error())
         c.String(500, "Unable to create build directory")
     }
 
-    WriteFile("builds/"+ buildId +"/metadata", c.Request.Body)
+    WriteFile(path.Join(buildDir, buildId, "metadata"), c.Request.Body)
     c.String(200, "Build created successfully")
 }
 
@@ -129,7 +132,7 @@ func GetBuildMetadata(c *gin.Context) {
         return
     }
 
-    data, err := ioutil.ReadFile("builds/"+id+"/metadata")
+    data, err := ioutil.ReadFile(path.Join(buildDir, id, "metadata"))
     if err == nil {
         c.String(200, string(data))
     } else {
@@ -149,7 +152,7 @@ func ListBuilds(c *gin.Context) {
     a := make(map[string]interface{}, 0)
     for _, f := range files {
         if f.IsDir() {
-            data, err := ioutil.ReadFile("builds/"+f.Name()+"/metadata")
+            data, err := ioutil.ReadFile(path.Join(buildDir, f.Name(), "metadata"))
             if err == nil {
                 var js interface{}
                 err = json.Unmarshal(data, &js)
@@ -174,7 +177,7 @@ func WriteLogs(c *gin.Context) {
         return
     }
 
-    err := WriteFile("builds/"+id+"/logs", c.Request.Body)
+    err := WriteFile(path.Join(buildDir, id, "logs"), c.Request.Body)
     if err == nil {
         c.String(200, "logs written")
     } else {
@@ -190,7 +193,7 @@ func GetLogs(c *gin.Context) {
         return
     }
 
-    data, err := ioutil.ReadFile("builds/"+id+"/logs")
+    data, err := ioutil.ReadFile(path.Join(buildDir, id, "logs"))
     if err == nil {
         c.String(200, string(data))
     } else {
@@ -207,14 +210,14 @@ func WriteArtifact(c *gin.Context) {
         return
     }
 
-    err := os.MkdirAll("builds/"+buildId+"/artifacts/", 0777)
+    err := os.MkdirAll(path.Join(buildDir, buildId, "artifacts"), 0777)
     if err != nil {
         log.Printf("Could not create artifacts folder for build %s, %s\n", buildId, err)
         c.String(500, "Could not create artifacts folder for build %s, %s", buildId, err)
         return
     }
 
-    err = WriteFile("builds/"+buildId+"/artifacts/"+artifactId, c.Request.Body)
+    err = WriteFile(path.Join(buildDir, buildId, "artifacts", artifactId), c.Request.Body)
     if err == nil {
         c.String(200, "Artifact written")
     } else {
@@ -231,7 +234,7 @@ func GetArtifact(c *gin.Context) {
         return
     }
 
-    c.File("builds/"+buildId+"/artifacts/"+artifactId)
+    c.File(path.Join(buildDir, buildId, "artifacts", artifactId))
 }
 
 func ListArtifacts(c *gin.Context) {
@@ -243,7 +246,7 @@ func ListArtifacts(c *gin.Context) {
 
 
     // TODO: Make sure builds/buildId exists
-    artifactsDir := "builds/"+buildId+"/artifacts"
+    artifactsDir := path.Join(buildDir, buildId, "artifacts")
     if _, err := os.Stat(artifactsDir); os.IsNotExist(err) {
         c.JSON(200, make([]string, 0))
         return
