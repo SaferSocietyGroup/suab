@@ -6,7 +6,7 @@ TEST_NAME=`basename $TEST_DIR`
 IMAGE_TAG="apa"
 
 SUAB_BINARY="`dirname $0`/../../build/suab"
-TEST_CMD="$SUAB_BINARY -d $IMAGE_TAG -m http://nowhere:80 -s magic:0"
+TEST_CMD="$SUAB_BINARY -d $IMAGE_TAG"
 
 echo "Running test $TEST_NAME"
 
