@@ -83,7 +83,7 @@ func srcAsssetsDockerCmdSh() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "src/asssets/docker-cmd.sh", size: 743, mode: os.FileMode(509), modTime: time.Unix(1464236013, 0)}
+	info := bindataFileInfo{name: "src/asssets/docker-cmd.sh", size: 743, mode: os.FileMode(509), modTime: time.Unix(1464591579, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }

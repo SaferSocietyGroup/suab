@@ -107,7 +107,7 @@ func ReadAndParseEffectiveConf(configFilePath string) (*Config, error){
 		if err != nil {
 			return nil, err
 		}
-		return merge(flagsConf, fileConf), nil
+		return Merge(*flagsConf, *fileConf), nil
 	} else {
 		return flagsConf, nil
 	}
@@ -117,7 +117,7 @@ func fileExists(path string) bool {
 	return err == nil
 }
 
-func merge(important *Config, lessImportant *Config) *Config {
+func Merge(important Config, lessImportant Config) *Config {
 	if len(important.DockerImageTag) == 0 {
 		important.DockerImageTag = lessImportant.DockerImageTag
 	}
@@ -135,5 +135,5 @@ func merge(important *Config, lessImportant *Config) *Config {
 		important.Environment = lessImportant.Environment
 	}
 
-	return important
+	return &important
 }

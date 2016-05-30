@@ -35,7 +35,7 @@ func SubmitDocker(suabShellScript string, imageTag string, masterUrl string, swa
 	cmd.Args = appendEnv(cmd.Args, env)
 	cmd.Args = append(cmd.Args, imageTag, "-c", suabCmd)
 
-	if swarmUri != "magic:0" {
+	if len(swarmUri) > 0 {
 		cmd.Env = []string{"DOCKER_HOST=" + swarmUri}
 	}
 	cmd.Stdout = os.Stdout
