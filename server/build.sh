@@ -17,9 +17,11 @@ function build {
 }
 
 # Generate assets
+pushd $WD
 PATH=$PATH:"./bin"
-go-bindata-assetfs ../web-ui/... ../client/build/...
+go-bindata-assetfs -ignore .*node_modules.* ../web-ui/... ../client/build/...
 mv bindata_assetfs.go src/suab-server/assetfs.go
+popd
 
 build linux
 echo
