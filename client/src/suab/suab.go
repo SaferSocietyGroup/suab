@@ -6,6 +6,8 @@ import (
 	"config"
 	"os"
 	"strings"
+	"net"
+	"errors"
 )
 
 func main() {
@@ -36,12 +38,22 @@ func main() {
 }
 
 func getAndValidateConfigOrExit(configFilePath string) *config.Config {
+	externalIP, err := externalIP()
+	var defaults config.Config;
+	if err == nil {
+		defaults = config.Config {
+			MasterUrl: externalIP + ":8081",
+		}
+	} else {
+		defaults = config.Config{}
+	}
 
 	conf, err := config.ReadAndParseEffectiveConf(configFilePath);
 	if err != nil {
 		fmt.Printf("%+v\n", err)
 		os.Exit(1)
 	}
+	conf = config.Merge(*conf, defaults)
 
 	if errs := validate(conf, configFilePath); len(errs) > 0  {
 		fmt.Printf("Invalid config.\n  %s\n", strings.Join(errs, "\n  "))
@@ -50,6 +62,45 @@ func getAndValidateConfigOrExit(configFilePath string) *config.Config {
 	}
 
 	return conf
+}
+
+// shamelessly stolen from http://stackoverflow.com/questions/23558425/how-do-i-get-the-local-ip-address-in-go
+// Thanks Sebastian and IanB
+func externalIP() (string, error) {
+	ifaces, err := net.Interfaces()
+	if err != nil {
+		return "", err
+	}
+	for _, iface := range ifaces {
+		if iface.Flags&net.FlagUp == 0 {
+			continue // interface down
+		}
+		if iface.Flags&net.FlagLoopback != 0 {
+			continue // loopback interface
+		}
+		addrs, err := iface.Addrs()
+		if err != nil {
+			return "", err
+		}
+		for _, addr := range addrs {
+			var ip net.IP
+			switch v := addr.(type) {
+			case *net.IPNet:
+				ip = v.IP
+			case *net.IPAddr:
+				ip = v.IP
+			}
+			if ip == nil || ip.IsLoopback() {
+				continue
+			}
+			ip = ip.To4()
+			if ip == nil {
+				continue // not an ipv4 address
+			}
+			return ip.String(), nil
+		}
+	}
+	return "", errors.New("are you connected to the network?")
 }
 
 func validate(conf *config.Config, configFile string) []string {
@@ -61,10 +112,6 @@ func validate(conf *config.Config, configFile string) []string {
 
 	if conf.MasterUrl == "" {
 		errs = append(errs, "You must specify a valid master url, either via the -m flag, or via the \"masterUrl\": \"http://example.com:8080\" in " + configFile)
-	}
-
-	if conf.SwarmUri == "" {
-		errs = append(errs, "You must specify a valid docker swarm uri, either via the -s flag, or via the \"swarmUri\": \"example.com:4000\" in " + configFile)
 	}
 
 	return errs
