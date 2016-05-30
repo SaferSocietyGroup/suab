@@ -1,13 +1,12 @@
 #!/usr/bin/env sh
 
-BASE_URL=$1
-IMAGE_TAG=$2
-
 LOG_FILE=/tmp/run-output
 EXIT_CODE_FILE=/tmp/suab-exit-code
 # Start a subshell and redirect all output to a file
 (
     export SUAB_BUILD_ID=`hostname`
+    export BASE_URL=http://$1/build/$SUAB_BUILD_ID
+    export IMAGE_TAG=$2
     echo "BuildId: $SUAB_BUILD_ID"
 
     curl --data "{\"image\": \"${IMAGE_TAG}\"}" --silent --show-error ${BASE_URL}

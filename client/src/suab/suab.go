@@ -20,7 +20,7 @@ func main() {
 		fmt.Printf("Could not extract the script to run in the docker container, %v\n", err)
 		os.Exit(3)
 	}
-	baseUrl := conf.MasterUrl + "/build/$SUAB_BUILD_ID"
+	baseUrl := conf.MasterUrl
 	suabShellScript = injectVariables(suabShellScript, baseUrl, conf.DockerImageTag)
 
 	submitter := submitters.GetSubmitter()
@@ -42,7 +42,7 @@ func getAndValidateConfigOrExit(configFilePath string) *config.Config {
 	var defaults config.Config;
 	if err == nil {
 		defaults = config.Config {
-			MasterUrl: externalIP + ":8081",
+			MasterUrl: externalIP + ":8080",
 		}
 	} else {
 		defaults = config.Config{}
