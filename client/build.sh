@@ -17,7 +17,9 @@ function build {
 }
 
 # Generate assets
+pushd $WD
 bin/go-bindata -o src/suab/assets.go src/asssets/...
+popd
 
 # Compile
 build linux
