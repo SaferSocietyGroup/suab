@@ -1,8 +1,8 @@
 # suab - The build system you already know
 
-suab is a continuous integration system that tries to get out of the way. You create a docker image that can do whatever it is you do in your builds and suab handles the logs and artifacts for you. It solves the same problem as e.g. Jenkins and Bamboo, but its DSL is bash and everything is under source control.
+suab is a continuous integration system that tries to get out of the way. You create a docker image that can does whatever it is you do in your builds and suab handles the logs and artifacts for you. It solves the same problem as e.g. Jenkins and Bamboo, but its DSL is bash and everything is under source control.
 
-> **If you can build with bash, you can build in docker. If you can build in docker, you can build it on suab.**
+> **If you can build in a shell, you can build in docker. If you can build in docker, you can build it on suab.**
 
 ## Usage example
 Say we want to build [a simple golang program](https://github.com/eriklarko/golang-hello-world). The directory with all files used looks like this and can be [downloaded here](https://github.com/SaferSocietyGroup/suab/blob/master/examples/golang-hello).
