@@ -17,11 +17,12 @@ function build {
 }
 
 # Generate assets
-pushd $WD
-PATH=$PATH:"./bin"
+PATH=$PATH:"${WD}/bin"
+pushd $WD > /dev/null
+test -d ../client/build || (echo "The client wasn't built, building it" ; ../client/build.sh)
 go-bindata-assetfs -ignore .*node_modules.* ../web-ui/... ../client/build/...
 mv bindata_assetfs.go src/suab-server/assetfs.go
-popd
+popd > /dev/null
 
 build linux
 echo
