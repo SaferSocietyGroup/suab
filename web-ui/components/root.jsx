@@ -8,7 +8,8 @@ window.Root = React.createClass({
     },
 
     componentDidMount: function() {
-        $.getJSON('http://localhost:8080/builds')
+        console.log("APA", server)
+        $.getJSON("http://" + server + '/builds')
             .success(function(response) {
         	    this.setState({builds: Object.keys(response)});
             }.bind(this))
