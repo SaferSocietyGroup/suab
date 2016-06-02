@@ -35,6 +35,7 @@ func main() {
         })
     })
     r.POST("/build/:buildId", CreateBuild)
+    r.PATCH("/build/:buildId", AppendMetadata)
     r.GET("/build/:buildId", GetBuildMetadata)
     r.GET("/builds", ListBuilds)
     r.POST("/build/:buildId/logs", WriteLogs)
@@ -107,6 +108,60 @@ func CreateBuild(c *gin.Context) {
 
     WriteFile(path.Join(buildDir, buildId, "metadata"), c.Request.Body)
     c.String(200, "Build created successfully")
+}
+
+func AppendMetadata(c *gin.Context) {
+    buildId := c.Param("buildId")
+    if len(buildId) == 0 {
+        c.String(400, "You must specify a build id")
+        return
+    }
+
+    f, err := os.OpenFile(path.Join(buildDir, buildId, "metadata"), os.O_APPEND, 0600)
+    if err != nil {
+        log.Printf("Could not open metadata file, %v\n", err)
+        c.String(500, "Could not open metadata file, " + err.Error())
+        return
+    }
+    defer f.Close()
+
+    // The trick here is to merge the json in the existing metadata
+    // file with the json that comes in as the request body.
+    // we do this by unmarshalling to the same variable as per
+    // https://gist.github.com/bodokaiser/281851282e9519c6b9bc
+    data, err := ioutil.ReadAll(f)
+    if err != nil {
+        log.Printf("Could not read metadata file, %v\n", err)
+        c.String(500, "Could not read metadata file, " + err.Error())
+        return
+    }
+    var dataAsJson interface{}
+    err = json.Unmarshal(data, dataAsJson)
+    if err != nil {
+        log.Printf("Could not parse metadata as json, %v\n", err)
+        c.String(500, "Could not parse metadata as json, " + err.Error())
+        return
+    }
+    err = json.Unmarshal(c.Request.Body, dataAsJson)
+    if err != nil {
+        log.Printf("Could not parse new metadata as json, %v\n", err)
+        c.String(500, "Could not parse new metadata as json, " + err.Error())
+        return
+    }
+    data, err = json.Marshal(dataAsJson)
+    if err != nil {
+        log.Printf("Could not turn the new json into a byte array, %v\n", err)
+        c.String(500, "Could not turn the new json into a byte array, " + err.Error())
+        return
+    }
+
+    // Now we have the merged json as a byte array in data
+    if _, err = f.Write(data); err != nil {
+        log.Printf("Could not write metadata to file, %v\n", err)
+        c.String(500, "Could not write metadata to file, " + err.Error())
+        return
+    }
+    c.String(200, "Logs updated")
 }
 
 func WriteFile(file string, source io.Reader) error {
