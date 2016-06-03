@@ -16,11 +16,11 @@ export default class ArtifactPreview extends React.Component {
     }
 
     onFetchSuccess(data, _, jqxhr) {
-                if (jqxhr.getResponseHeader("Content-Type").indexOf("text") >= 0) {
-                    this.setState({data: data.substring(0, 200)});
-                } else {
-                    this.setState({data: "Not plain text"});
-                }
+        if (jqxhr.getResponseHeader("Content-Type").indexOf("text") >= 0) {
+            this.setState({data: data.substring(0, 200)});
+        } else {
+            this.setState({data: "Not plain text"});
+        }
     }
 
     onFetchError() {

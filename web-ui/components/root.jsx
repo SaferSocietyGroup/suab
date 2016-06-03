@@ -88,6 +88,9 @@ export default class Root extends React.Component {
             <div style={{padding: "10px", clear: "both"}}>
                 {this.state.content}
             </div>
+            <footer style={{ position:"absolute", bottom:"0", width:"100%", height:"30px", backgroundColor: "#FFF" }}>
+                The linux and windows logos made by <a href='http://www.freepik.com/'>Freepic</a> from www.flaticon.com
+            </footer>
         </div>
     }
 }
