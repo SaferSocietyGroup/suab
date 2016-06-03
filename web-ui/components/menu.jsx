@@ -6,11 +6,16 @@ export default function(props) {
 
     let styles = {
         float: "right",
-        paddingRight: "20px",
+        margin: "10px",
+        border: "1px solid black",
+        padding: "17px",
+        paddingBottom: "10px",
     };
 
-    return <div style={styles}>
-        <a href={linuxUrl}>download linux client</a> &nbsp;
-        <a href={winUrl}>download windows client</a>
-    </div>
+    return <fieldset style={styles}>
+        <legend>Download client</legend>
+
+        <a href={linuxUrl} style={{marginLeft: "20px"}}><img src='images/linux.png' /></a> &nbsp;
+        <a href={winUrl} style={{marginLeft: "20px"}}><img src='images/windows.jpg' /></a>
+    </fieldset>
 }

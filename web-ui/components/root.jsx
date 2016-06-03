@@ -70,7 +70,6 @@ export default class Root extends React.Component {
     }
 
     render() {
-
         var buildList = undefined;
         if (this.state.buildPlans === null) {
             buildList = "Could not load builds, see console log";
@@ -88,7 +87,7 @@ export default class Root extends React.Component {
             <div style={{padding: "10px", clear: "both"}}>
                 {this.state.content}
             </div>
-            <footer style={{ position:"absolute", bottom:"0", width:"100%", height:"30px", backgroundColor: "#FFF" }}>
+            <footer style={{ position:"absolute", bottom:"0px", width:"100%", height:"30px", backgroundColor: "#FFF" }}>
                 The linux and windows logos made by <a href='http://www.freepik.com/'>Freepic</a> from www.flaticon.com
             </footer>
         </div>
