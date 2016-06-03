@@ -7,7 +7,7 @@ window.ArtifactPreview = React.createClass({
     },
 
     componentWillMount: function() {
-        $.get("http://localhost:8080/build/" + this.props.buildId + "/artifacts/" + this.props.artifactName)
+        $.get(server + "/build/" + this.props.buildId + "/artifacts/" + this.props.artifactName)
             .success((data, _, jqxhr) => {
                 if (jqxhr.getResponseHeader("Content-Type").indexOf("text") >= 0) {
                     this.setState({data: data.substring(0, 200)});
@@ -22,7 +22,7 @@ window.ArtifactPreview = React.createClass({
     },
 
     render: function() {
-        let href = "http://localhost:8080/build/" +this.props.buildId+ "/artifacts/" + this.props.artifactName;
+        let href = server + "/build/" +this.props.buildId+ "/artifacts/" + this.props.artifactName;
 
         return <div>
             <a href={href} target="_blank">{this.props.artifactName}</a>

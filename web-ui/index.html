@@ -8,14 +8,16 @@
     <script src="js/babel-browser.min.js"></script>
     <script src="js/jquery-2.2.4.min.js"></script>
 
-    <link rel="stylesheet" href="css/pure-min.css">
+    <link rel="stylesheet" href="css/kube.min.css">
 </head>
 <body>
-    <div id="example"></div>
+    <div id="app"></div>
     <script type="text/javascript">
-        window.server = "localhost:8080";
+        window.server = "http://localhost:8080";
     </script>
     <script type="text/babel" src="components/menu.jsx"></script>
+    <script type="text/babel" src="components/build-plans-list.jsx"></script>
+    <script type="text/babel" src="components/build-list.jsx"></script>
     <script type="text/babel" src="components/artifact-preview.jsx"></script>
     <script type="text/babel" src="components/build.jsx"></script>
     <script type="text/babel" src="components/root.jsx"></script>
@@ -23,7 +25,7 @@
 
         ReactDOM.render(
             <Root />,
-            document.getElementById('example')
+            document.getElementById('app')
         );
     </script>
 </body>

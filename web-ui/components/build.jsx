@@ -7,7 +7,7 @@ window.Build = React.createClass({
     },
 
     componentDidMount() {
-        $.getJSON("http://localhost:8080/build/" + this.props.buildId + "/artifacts")
+        $.getJSON(server + "/build/" + this.props.buildId + "/artifacts")
             .success(response => {
                 this.setState({artifacts: response});
             })
@@ -25,18 +25,16 @@ window.Build = React.createClass({
         } else if (this.state.artifacts.length === 0) {
             artifacts = "no artifacts";
         } else {
-            artifacts = this.state.artifacts.map(artifact => {
-                //let href = "http://localhost:8080/build/" +this.props.buildId+ "/artifacts/" + artifact;
-                //return <a href={href}>{artifact}</a>
-                return <ArtifactPreview buildId={this.props.buildId} artifactName={artifact} />
-            });
-        }
-        return <div>
-            <h2>Build {this.props.buildId}</h2>
             <div>
                 <h3>Artifacts</h3>
-                {artifacts}
+                {artifacts = this.state.artifacts.map(artifact => {
+                    return <ArtifactPreview buildId={this.props.buildId} artifactName={artifact} />
+                })}
             </div>
+        }
+        return <div style={{clear: "both"}}>
+            <h2>Build {this.props.buildId}</h2>
+            {artifacts}
         </div>
     }
 });
