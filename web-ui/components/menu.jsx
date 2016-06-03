@@ -12,10 +12,12 @@ export default function(props) {
         paddingBottom: "10px",
     };
 
-    return <fieldset style={styles}>
-        <legend>Download client</legend>
-
-        <a href={linuxUrl} style={{marginLeft: "20px"}}><img src='images/linux.png' /></a> &nbsp;
-        <a href={winUrl} style={{marginLeft: "20px"}}><img src='images/windows.jpg' /></a>
-    </fieldset>
+    return <div>
+            <h1 style={{float: "left", margin: styles.margin}}>SUAB - we put a shell in your build</h1>
+            <fieldset style={styles}>
+                <legend>Download client</legend>
+                <a href={linuxUrl} style={{marginLeft: "20px"}}><img src='images/linux.png' /></a> &nbsp;
+                <a href={winUrl} style={{marginLeft: "20px"}}><img src='images/windows.jpg' /></a>
+            </fieldset>
+        </div>
 }
