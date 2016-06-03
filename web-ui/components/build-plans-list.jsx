@@ -1,4 +1,6 @@
-window.BuildPlansListCircles = function(props) {
+import React from "react"
+
+export default function(props) {
 
     function renderBuildCircles(buildPlans) {
         return Object.keys(buildPlans).map(function (imageName) {

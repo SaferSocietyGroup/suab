@@ -1,4 +1,6 @@
-window.BuildList = function(props) {
+import React from "react"
+
+export default function(props) {
 
     function renderBuilds(builds) {
         let buildStyle = {

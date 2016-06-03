@@ -1,13 +1,20 @@
-window.Root = React.createClass({
+import React from "react"
+import Menu from "./menu.jsx"
+import BuildList from "./build-list.jsx"
+import BuildPlansList from "./build-plans-list.jsx"
+import Build from "./build.jsx"
 
-    getInitialState: function() {
-        return {
+export default class Root extends React.Component {
+
+    constructor(props) {
+        super(props);
+        this.state = {
             buildPlans: [],
             content: null,
         };
-    },
+    }
 
-    componentDidMount: function() {
+    componentDidMount() {
         $.getJSON(server + '/builds')
             .success(function(response) {
                 if (!response) {
@@ -28,9 +35,9 @@ window.Root = React.createClass({
         	    console.log("ERROR", err, this);
         	    this.setState({buildPlans: null});
             }.bind(this));
-    },
+    }
 
-    groupBuildsByImage: function (builds) {
+    groupBuildsByImage(builds) {
         var images = {};
         for (let i in builds) {
             let buildId = Object.keys(builds[i])[0];
@@ -46,29 +53,29 @@ window.Root = React.createClass({
         }
 
         return images;
-    },
+    }
 
-    navigateToBuildPlan: function(buildPlan) {
-        console.log("Navigating to", buildPlan);
-        this.setState({content: <BuildList builds={this.state.buildPlans[buildPlan]} onBuildClick={this.navigateToBuild} />});
-    },
+    navigateToBuildPlan(buildPlan) {
+        console.log("Navigating to build plan", buildPlan, this);
+        this.setState({content: <BuildList builds={this.state.buildPlans[buildPlan]} onBuildClick={this.navigateToBuild.bind(this)} />});
+    }
 
-    navigateToBuild: function(buildId) {
+    navigateToBuild(buildId) {
         let buildPlan = Object.keys(this.state.buildPlans).filter(planKey => this.state.buildPlans[planKey].filter(build => build.id === buildId))[0];
-        console.log("Navigating to", buildId, buildPlan);
+        console.log("Navigating to build", buildId, "in build plan", buildPlan);
         this.setState({content: <div>
-            <BuildList builds={this.state.buildPlans[buildPlan]} onBuildClick={this.navigateToBuild} />
+            <BuildList builds={this.state.buildPlans[buildPlan]} onBuildClick={this.navigateToBuild.bind(this)} />
             <Build buildId={buildId} />
         </div>});
-    },
+    }
 
-    render: function() {
+    render() {
 
         var buildList = undefined;
         if (this.state.buildPlans === null) {
             buildList = "Could not load builds, see console log";
         } else {
-            buildList = <BuildPlansListCircles buildPlans={this.state.buildPlans} onBuildPlanClick={this.navigateToBuildPlan}/>
+            buildList = <BuildPlansList buildPlans={this.state.buildPlans} onBuildPlanClick={this.navigateToBuildPlan.bind(this)}/>
         }
 
         return <div>
@@ -82,5 +89,5 @@ window.Root = React.createClass({
                 {this.state.content}
             </div>
         </div>
-    },
-});
+    }
+}

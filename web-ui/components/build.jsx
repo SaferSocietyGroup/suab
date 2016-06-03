@@ -1,10 +1,14 @@
-window.Build = React.createClass({
+import React from "react"
+import ArtifactPreview from "./artifact-preview.jsx"
 
-    getInitialState: function() {
-        return {
+export default class Build extends React.Component {
+
+    constructor(props) {
+        super(props);
+        this.state = {
             artifacts: [],
         };
-    },
+    }
 
     componentDidMount() {
         $.getJSON(server + "/build/" + this.props.buildId + "/artifacts")
@@ -15,9 +19,9 @@ window.Build = React.createClass({
                 console.log("Failed loading artifacts", arguments);
                 this.setState({artifacts: null});
             });
-    },
+    }
 
-    render: function() {
+    render() {
 
         let artifacts;
         if (this.state.artifacts === null) {
@@ -37,4 +41,4 @@ window.Build = React.createClass({
             {artifacts}
         </div>
     }
-});
+}
