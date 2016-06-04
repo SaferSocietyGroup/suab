@@ -24,6 +24,7 @@ export default function(props) {
             height: "350px",
             marginBottom: "5px",
             backgroundColor: color,
+            fontFamily: "jura",
 
             display: "flex",
             justifyContent: "center",
@@ -49,6 +50,7 @@ export default function(props) {
 
             height: "200px",
             backgroundColor: color,
+            fontFamily: "jura",
 
             display: "flex",
             justifyContent: "center",

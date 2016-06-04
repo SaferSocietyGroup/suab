@@ -13,7 +13,11 @@ export default function(props) {
     };
 
     return <div>
-            <h1 style={{float: "left", margin: styles.margin}}>SUAB - we put a shell in your build</h1>
+            <div style={{float: "left", margin: styles.margin}}>
+                <h1 style={{fontFamily: "jura", margin: "0px"}}>SUAB</h1>
+                <h2 style={{fontFamily: "lavanderia", fontSize: "2.5em", margin: "0px"}}> - we put a shell in your build</h2>
+            </div>
+
             <fieldset style={styles}>
                 <legend>Download client</legend>
                 <a href={linuxUrl} style={{marginLeft: "20px"}}><img src='images/linux.png' /></a> &nbsp;
