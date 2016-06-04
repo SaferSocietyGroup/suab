@@ -1,4 +1,5 @@
 import React from "react"
+import { Link } from "react-router"
 
 export default function(props) {
     let linuxUrl = server + "/client/linux"
@@ -14,10 +15,12 @@ export default function(props) {
     };
 
     return <div style={{display: "flex", flexDirection: "row", flexWrap: "nowrap", justifyContent: "space-between"}}>
-            <div style={{float: "left", margin: styles.margin}}>
-                <h1 style={{fontFamily: "jura", margin: "0px"}}>SUAB</h1>
-                <h2 style={{fontFamily: "lavanderia", fontSize: "2.5em", margin: "0px"}}> - we put a shell in your build</h2>
-            </div>
+            <Link to="/">
+                <div style={{float: "left", margin: styles.margin, color: "black"}}>
+                    <h1 style={{fontFamily: "jura", margin: "0px"}}>SUAB</h1>
+                    <h2 style={{fontFamily: "lavanderia", fontSize: "2.5em", margin: "0px"}}> - we put a shell in your build</h2>
+                </div>
+            </Link>
             <div></div>
             <fieldset style={styles}>
                 <legend>Download client</legend>

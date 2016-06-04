@@ -1,4 +1,5 @@
 import React from "react"
+import { Link } from "react-router"
 import {successColor, failColor, unknownColor} from "../css-js/build-colors";
 
 export default function(props) {
@@ -29,9 +30,10 @@ export default function(props) {
                 //localBuildStyle.marginRight = "0px";
             }
 
-            let onClick = () => props.onBuildClick(build.id);
 
-            return <div style={localBuildStyle} onClick={onClick} title={"Build " + build.id}></div>
+            return <Link to={"/" + build.id}>
+                <div style={localBuildStyle} title={"Build " + build.id}></div>
+            </Link>
         });
     }
 

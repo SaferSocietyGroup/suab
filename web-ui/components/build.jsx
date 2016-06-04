@@ -32,7 +32,7 @@ export default class Build extends React.Component {
             <div>
                 <h3>Artifacts</h3>
                 {artifacts = this.state.artifacts.map(artifact => {
-                    return <ArtifactPreview buildId={this.props.buildId} artifactName={artifact} />
+                    return <ArtifactPreview buildId={this.props.build.id} artifactName={artifact} />
                 })}
             </div>
         }

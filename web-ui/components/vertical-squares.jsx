@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router";
 import BuildList from "./build-list.jsx";
 import Build from "./build.jsx";
 import {successColor, failColor, unknownColor} from "../css-js/build-colors";
@@ -9,15 +10,10 @@ export default function (props) {
     if (!buildPlans || Object.keys(buildPlans).length == 0) {
         return <p>n/a</p>;
     }
-    console.log("dasdd", buildPlans);
 
     let sortedBuildPlans = sortBuildPlans(buildPlans);
-    let selectedBuildPlan = buildPlans[sortedBuildPlans[0]]; // TODO: make real. I really need to change to react router
     let selectedBuild = props.selectedBuild;
-
-
-    selectedBuild = selectedBuildPlan[0]; // TODO: remove
-    console.log("apa", sortedBuildPlans, buildPlans, selectedBuildPlan, selectedBuild);
+    let selectedBuildPlan = buildPlans[selectedBuild.image];
 
     let squares = sortedBuildPlans.map(image => renderSquare(buildPlans[image]));
     let buildInfo = renderBuildArea(selectedBuildPlan, selectedBuild);
@@ -56,16 +52,19 @@ function renderSquare(buildPlan) {
         justifyContent: "center",
         alignItems: "center",
         overflow: "hidden",
+
+        color: "black",
     };
 
-    return <div style={buildStyle}>{buildPlan[0].image}</div>
+    return <Link to={"/" + buildPlan[buildPlan.length - 1].id} style={{textDecoration: "none"}}>
+        <div style={buildStyle}>{buildPlan[0].image}</div>
+    </Link>
 }
 
 function renderBuildArea(buildPlan, build) {
-    console.log(build);
     return <div>
             <BuildList builds={buildPlan} />
             <div style={{height: "40px"}}></div>
             <Build build={build} />
-        </div>
+    </div>
 }
