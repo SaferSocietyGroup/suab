@@ -11,7 +11,7 @@ export default class Build extends React.Component {
     }
 
     componentDidMount() {
-        $.getJSON(server + "/build/" + this.props.buildId + "/artifacts")
+        $.getJSON(server + "/build/" + this.props.build.id + "/artifacts")
             .success(response => {
                 this.setState({artifacts: response});
             })
@@ -37,7 +37,7 @@ export default class Build extends React.Component {
             </div>
         }
         return <div style={{clear: "both"}}>
-            <h2>Build {this.props.buildId}</h2>
+            <h2>Build {this.props.build.id} of {this.props.build.image}</h2>
             {artifacts}
         </div>
     }

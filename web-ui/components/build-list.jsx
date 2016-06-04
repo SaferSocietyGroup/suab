@@ -1,4 +1,5 @@
 import React from "react"
+import {successColor, failColor, unknownColor} from "../css-js/build-colors";
 
 export default function(props) {
 
@@ -13,11 +14,6 @@ export default function(props) {
             marginRight: "10px",
             marginTop: "10px",
 
-            WebkitBoxShadow: "1px 1px 5px 1px #555",
-            MozBoxShadow: "1px 1px 5px 1px #555",
-            BoxShadow: "1px 1px 5x 1px #555",
-            borderRadius: "3px",
-
             cursor: "pointer",
 
             float: "left",
@@ -25,7 +21,7 @@ export default function(props) {
 
         let lastBuildId = builds[builds.length - 1].id;
         return builds.map(build => {
-            let color = build.exitCode === undefined ?  "lightblue" : (build.exitCode == 0 ? "lightgreen" : "lightcoral");
+            let color = build.exitCode === undefined ?  unknownColor : (build.exitCode == 0 ? successColor : failColor);
 
             let localBuildStyle = JSON.parse(JSON.stringify(buildStyle)); // Hehe.. :D
             localBuildStyle.backgroundColor = color;

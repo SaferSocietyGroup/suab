@@ -1,11 +1,7 @@
 import React from "react";
-import BuildList from "./build-list.jsx";
+import {successColor, failColor, unknownColor} from "../css-js/build-colors";
 
 export default function(props) {
-
-    let successColor = "#afa";
-    let failColor = "lightsalmon";
-    let unknownColor = "lightblue";
 
     function sortBuildPlans() {
         return Object.keys(props.buildPlans).sort((a, b) => {
@@ -34,7 +30,7 @@ export default function(props) {
         return <div style={styles}>
             <div>
                 <h1 style={{textAlign: "center"}}>{buildPlan[0].image}</h1>
-                <BuildList builds={buildPlan} onBuildClick={props.onBuildClick}/>
+                {renderBuilds(buildPlan)}
             </div>
         </div>
     }

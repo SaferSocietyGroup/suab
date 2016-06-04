@@ -1,9 +1,8 @@
 import React from "react"
 import Menu from "./menu.jsx"
 import BuildList from "./build-list.jsx"
-//import BuildPlansList from "./build-plans-list.jsx"
 import BuildPlansList from "./build-plans-grid.jsx"
-//import BuildPlansList from "./animate-grid-to-list.jsx"
+//import BuildPlansList from "./vertical-squares.jsx"
 import Build from "./build.jsx"
 
 export default class Root extends React.Component {
