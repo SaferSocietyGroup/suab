@@ -6,7 +6,8 @@ BUILD_CMD="go build -v suab"
 
 READPATH=`readlink -nf $0`
 WD=`dirname $READPATH`
-export GOPATH=$WD
+export GO15VENDOREXPERIMENT=1
+export GOPATH=${WD}
 mkdir -p "${WD}/build"
 
 function build {
