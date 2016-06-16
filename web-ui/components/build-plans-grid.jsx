@@ -22,13 +22,13 @@ export default function(props) {
 
             p.push(fullWidthBuildPlan(buildPlans[sortedBuildPlans[0]]));
 
-            let subs = []
+            const subs = []
             for(let i in sortedBuildPlans) {
                 if (i == 0) {
                     continue;
                 }
 
-                let image = sortedBuildPlans[i];
+                const image = sortedBuildPlans[i];
                 subs.push(notFullWidth(buildPlans[image]));
             }
 
@@ -48,17 +48,17 @@ export default function(props) {
 
 function sortBuildPlans(buildPlans) {
     return Object.keys(buildPlans).sort((a, b) => {
-        let aa = buildPlans[a];
-        let bb = buildPlans[b];
+        const aa = buildPlans[a];
+        const bb = buildPlans[b];
 
         return bb.length - aa.length;
     });
 }
 
 function fullWidthBuildPlan(buildPlan) {
-    let mostRecentBuild = buildPlan[buildPlan.length - 1];
-    let color = fromExitCode(mostRecentBuild.exitCode);
-    let styles = {
+    const mostRecentBuild = buildPlan[buildPlan.length - 1];
+    const color = fromExitCode(mostRecentBuild.exitCode);
+    const styles = {
         width: "100%",
         height: "350px",
         marginBottom: "5px",
@@ -79,9 +79,9 @@ function fullWidthBuildPlan(buildPlan) {
 }
 
 function notFullWidth(buildPlan) {
-    let mostRecentBuild = buildPlan[buildPlan.length - 1];
-    let color = fromExitCode(mostRecentBuild.exitCode);
-    let styles = {
+    const mostRecentBuild = buildPlan[buildPlan.length - 1];
+    const color = fromExitCode(mostRecentBuild.exitCode);
+    const styles = {
         width: "24.28vw",
         float: "left",
         marginLeft: "5px",
@@ -96,10 +96,10 @@ function notFullWidth(buildPlan) {
         alignItems: "center",
     };
 
-    let maxBuilds = 8;
+    const maxBuilds = 8;
     let ellipsing = false;
     if (buildPlan.length > maxBuilds) {
-        let startIndex = buildPlan.length - (maxBuilds + 1); // +1 for the ellips
+        const startIndex = buildPlan.length - (maxBuilds + 1); // +1 for the ellips
         buildPlan = buildPlan.slice(startIndex, startIndex + maxBuilds);
         ellipsing = true;
     }
@@ -117,22 +117,22 @@ function renderBuilds(builds, prefix) {
         return <div>No builds</div>
     }
 
-    let squares = [];
+    const squares = [];
     if (prefix) {
         squares.push(<div style={baseStyle}>...</div>);
     }
 
-    let lastBuild = builds[builds.length - 1];
+    const lastBuild = builds[builds.length - 1];
     builds.map(build => {
-        let color = fromExitCode(build.exitCode);
+        const color = fromExitCode(build.exitCode);
 
-        let localBuildStyle = JSON.parse(JSON.stringify(buildStyle)); // Hehe.. :D
+        const localBuildStyle = JSON.parse(JSON.stringify(buildStyle)); // Hehe.. :D
         localBuildStyle.backgroundColor = color;
         if (build === lastBuild) {
             localBuildStyle.marginRight = "0px";
         }
 
-        let square = <div style={localBuildStyle} title={"Build " + build.id}></div>;
+        const square = <div style={localBuildStyle} title={"Build " + build.id}></div>;
         squares.push(<Link to={"/" + build.id}>{square}</Link>)
     });
     return squares;

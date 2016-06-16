@@ -4,12 +4,12 @@ export default function(props) {
 
     function renderBuildCircles(buildPlans) {
         return Object.keys(buildPlans).map(function (imageName) {
-            let buildPlan = buildPlans[imageName];
-            let onClick = () => props.onBuildPlanClick(imageName);
-            let lastBuild = buildPlan[buildPlan.length - 1];
+            const buildPlan = buildPlans[imageName];
+            const onClick = () => props.onBuildPlanClick(imageName);
+            const lastBuild = buildPlan[buildPlan.length - 1];
 
-            let color = lastBuild.exitCode === undefined ?  "lightblue" : (lastBuild.exitCode == 0 ? "lightgreen" : "lightcoral");
-            let circleStyle = {
+            const color = lastBuild.exitCode === undefined ?  "lightblue" : (lastBuild.exitCode == 0 ? "lightgreen" : "lightcoral");
+            const circleStyle = {
                 borderRadius: "50%",
                 width: "200px",
                 height: "200px",

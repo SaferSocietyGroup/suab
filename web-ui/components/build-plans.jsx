@@ -20,15 +20,15 @@ export default class Root extends React.Component {
                 if (!response) {
                     response = [];
                 } else {
-                    let arr = [];
+                    const arr = [];
                     for (var key in response) {
-                        let obj = {};
+                        const obj = {};
                         obj[key] = response[key];
                         arr.push(obj);
                     }
                     response = arr;
                 }
-                let buildPlans = this.groupBuildsByImage(response);
+                const buildPlans = this.groupBuildsByImage(response);
                 this.setState({
                     loadingState: "loaded",
                     lastError: null,
@@ -45,11 +45,11 @@ export default class Root extends React.Component {
     }
 
     groupBuildsByImage(builds) {
-        var images = {};
+        const images = {};
         for (let i in builds) {
-            let buildId = Object.keys(builds[i])[0];
-            let build = builds[i][buildId];
-            let key = build.image;
+            const buildId = Object.keys(builds[i])[0];
+            const build = builds[i][buildId];
+            const key = build.image;
 
             if (!images[key]) {
                 images[key] = [];
@@ -63,7 +63,7 @@ export default class Root extends React.Component {
 
     findImageFromBuildId(buildId) {
         for (let image of Object.keys(this.state.buildPlans)) {
-            let buildPlan = this.state.buildPlans[image];
+            const buildPlan = this.state.buildPlans[image];
             for (let build of buildPlan) {
                 if (build.id === buildId) {
                     return image;
@@ -76,7 +76,7 @@ export default class Root extends React.Component {
 
     findBuildById(buildId) {
         for (let image of Object.keys(this.state.buildPlans)) {
-            let buildPlan = this.state.buildPlans[image];
+            const buildPlan = this.state.buildPlans[image];
             for (let build of buildPlan) {
                 if (build.id === buildId) {
                     return build;
@@ -99,7 +99,7 @@ export default class Root extends React.Component {
 
     renderBuilds() {
         if (this.props.params && this.props.params.buildid) {
-            let build = this.findBuildById(this.props.params.buildid);
+            const build = this.findBuildById(this.props.params.buildid);
 
             return <BuildDetails
                         buildPlans={this.state.buildPlans}

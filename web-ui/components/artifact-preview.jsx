@@ -29,7 +29,7 @@ export default class ArtifactPreview extends React.Component {
     }
 
     render() {
-        let href = server + "/build/" +this.props.buildId+ "/artifacts/" + this.props.artifactName;
+        const href = server + "/build/" +this.props.buildId+ "/artifacts/" + this.props.artifactName;
 
         return <div>
             <a href={href} target="_blank">{this.props.artifactName}</a>

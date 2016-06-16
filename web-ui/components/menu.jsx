@@ -1,18 +1,19 @@
 import React from "react"
 import { Link } from "react-router"
 
-export default function(props) {
-    let linuxUrl = server + "/client/linux"
-    let winUrl = server + "/client/win"
+const linuxUrl = server + "/client/linux"
+const winUrl = server + "/client/win"
 
-    let styles = {
-        float: "right",
-        margin: "10px",
-        border: "1px solid black",
-        padding: "17px",
-        paddingBottom: "10px",
-        height: "100%",
-    };
+const styles = {
+    float: "right",
+    margin: "10px",
+    border: "1px solid black",
+    padding: "17px",
+    paddingBottom: "10px",
+    height: "100%",
+};
+
+export default function(props) {
 
     return <div style={{display: "flex", flexDirection: "row", flexWrap: "nowrap", justifyContent: "space-between"}}>
             <Link to="/">

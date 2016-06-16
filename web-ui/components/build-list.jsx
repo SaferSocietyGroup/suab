@@ -3,7 +3,8 @@ import { Link } from "react-router"
 import { fromExitCode } from "../css-js/build-colors";
 import { size, cursor, withSiblings } from "../css-js/small-build-squares";
 
-var buildStyle = $.extend(size, cursor, withSiblings, { marginTop: "10px"});
+const buildStyle = $.extend(size, cursor, withSiblings, { marginTop: "10px"});
+
 export default function(props) {
     let builds = "No builds";
     if (props.builds && Object.keys(props.builds).length > 0) {
@@ -20,11 +21,11 @@ function renderBuilds(builds) {
         return <div>No builds</div>
     }
 
-    let lastBuildId = builds[builds.length - 1].id;
+    const lastBuildId = builds[builds.length - 1].id;
     return builds.map(build => {
-        let color = fromExitCode(build.exitCode);
+        const color = fromExitCode(build.exitCode);
 
-        let localBuildStyle = JSON.parse(JSON.stringify(buildStyle)); // Hehe.. :D
+        const localBuildStyle = JSON.parse(JSON.stringify(buildStyle)); // Hehe.. :D
         localBuildStyle.backgroundColor = color;
 
         return <Link to={"/" + build.id}>

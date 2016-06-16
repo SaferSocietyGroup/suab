@@ -11,12 +11,12 @@ export default function (props) {
         return <p>n/a</p>;
     }
 
-    let sortedBuildPlans = sortBuildPlans(buildPlans);
-    let selectedBuild = props.selectedBuild;
-    let selectedBuildPlan = buildPlans[selectedBuild.image];
+    const sortedBuildPlans = sortBuildPlans(buildPlans);
+    const selectedBuild = props.selectedBuild;
+    const selectedBuildPlan = buildPlans[selectedBuild.image];
 
-    let squares = sortedBuildPlans.map(image => renderSquare(buildPlans[image]));
-    let buildInfo = renderBuildArea(selectedBuildPlan, selectedBuild);
+    const squares = sortedBuildPlans.map(image => renderSquare(buildPlans[image]));
+    const buildInfo = renderBuildArea(selectedBuildPlan, selectedBuild);
 
     return <div style={{display: "flex", flexDirection: "row", flexWrap: "nowrap", alignContent: "flex-start"}}>
         <div style={{marginLeft: "10px", maxWidth: "140px"}}>{squares}</div>
@@ -26,17 +26,17 @@ export default function (props) {
 
 function sortBuildPlans(buildPlans) {
     return Object.keys(buildPlans).sort((a, b) => {
-        let aa = buildPlans[a];
-        let bb = buildPlans[b];
+        const aa = buildPlans[a];
+        const bb = buildPlans[b];
 
         return bb.length - aa.length;
     });
 }
 
 function renderSquare(buildPlan) {
-    let mostRecentBuild = buildPlan[buildPlan.length - 1];
-    let color = mostRecentBuild.exitCode === undefined ? unknownColor : (mostRecentBuild.exitCode == 0 ? successColor : failColor);
-    let buildStyle = {
+    const mostRecentBuild = buildPlan[buildPlan.length - 1];
+    const color = mostRecentBuild.exitCode === undefined ? unknownColor : (mostRecentBuild.exitCode == 0 ? successColor : failColor);
+    const buildStyle = {
         height: "70px",
         marginRight: "10px",
         marginTop: "10px",
