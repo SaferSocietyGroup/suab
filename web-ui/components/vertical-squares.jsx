@@ -2,7 +2,7 @@ import React from "react";
 import { Link } from "react-router";
 import BuildList from "./build-list.jsx";
 import Build from "./build.jsx";
-import {successColor, failColor, unknownColor} from "../css-js/build-colors";
+import { fromExitCode } from "../css-js/build-colors";
 
 export default function (props) {
 
@@ -35,7 +35,7 @@ function sortBuildPlans(buildPlans) {
 
 function renderSquare(buildPlan) {
     const mostRecentBuild = buildPlan[buildPlan.length - 1];
-    const color = mostRecentBuild.exitCode === undefined ? unknownColor : (mostRecentBuild.exitCode == 0 ? successColor : failColor);
+    const color = fromExitCode(mostRecentBuild.exitCode);
     const buildStyle = {
         height: "70px",
         marginRight: "10px",
@@ -63,7 +63,7 @@ function renderSquare(buildPlan) {
 
 function renderBuildArea(buildPlan, build) {
     return <div>
-            <BuildList builds={buildPlan} />
+            <BuildList builds={buildPlan} selectedBuildId={build.id} />
             <div style={{height: "40px"}}></div>
             <Build build={build} />
     </div>

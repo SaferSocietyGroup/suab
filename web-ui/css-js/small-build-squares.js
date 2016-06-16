@@ -12,7 +12,7 @@ export var cursor = {
     cursor: "pointer",
 }
 export var withSiblings = {
-    float: "left",
+    display: "inline-block",
     marginRight: "10px",
 }
 
