@@ -15,7 +15,7 @@ export default function (props) {
     const selectedBuild = props.selectedBuild;
     const selectedBuildPlan = buildPlans[selectedBuild.image];
 
-    const squares = sortedBuildPlans.map(image => renderSquare(buildPlans[image]));
+    const squares = sortedBuildPlans.map(image => renderSquare(buildPlans[image], selectedBuild.image));
     const buildInfo = renderBuildArea(selectedBuildPlan, selectedBuild);
 
     return <div style={{display: "flex", flexDirection: "row", flexWrap: "nowrap", alignContent: "flex-start"}}>
@@ -33,10 +33,16 @@ function sortBuildPlans(buildPlans) {
     });
 }
 
-function renderSquare(buildPlan) {
+const shadow = {
+    WebkitBoxShadow: "1px 1px 5px 1px #555",
+    MozBoxShadow: "1px 1px 5px 1px #555",
+    BoxShadow: "1px 1px 5x 1px #555",
+    borderRadius: "3px",
+};
+function renderSquare(buildPlan, selectedImage) {
     const mostRecentBuild = buildPlan[buildPlan.length - 1];
     const color = fromExitCode(mostRecentBuild.exitCode);
-    const buildStyle = {
+    let buildStyle = {
         height: "70px",
         marginRight: "10px",
         marginTop: "10px",
@@ -55,6 +61,10 @@ function renderSquare(buildPlan) {
 
         color: "black",
     };
+
+    if (buildPlan[0].image === selectedImage) {
+        buildStyle = $.extend(buildStyle, shadow);
+    }
 
     return <Link to={"/" + buildPlan[buildPlan.length - 1].id} style={{textDecoration: "none"}}>
         <div style={buildStyle}>{buildPlan[0].image}</div>
