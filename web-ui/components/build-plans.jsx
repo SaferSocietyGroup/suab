@@ -8,6 +8,8 @@ export default class Root extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            loadingState: "not-loaded",
+            lastError: null,
             buildPlans: {},
         }
     }
@@ -27,11 +29,18 @@ export default class Root extends React.Component {
                     response = arr;
                 }
                 let buildPlans = this.groupBuildsByImage(response);
-        	    this.setState({buildPlans: buildPlans});
+                this.setState({
+                    loadingState: "loaded",
+                    lastError: null,
+                    buildPlans: buildPlans,
+                });
             }.bind(this))
-            .error(function(err) {
-        	    console.log("ERROR", err, this);
-        	    this.setState({buildPlans: null});
+            .error(function(err, b, c) {
+                this.setState({
+                    loadingState: "error",
+                    lastError: "Failed loading builds from server, please check the network tab in the dev tools :)",
+                    buildPlans: null
+                });
             }.bind(this));
     }
 
@@ -79,6 +88,16 @@ export default class Root extends React.Component {
     }
 
     render() {
+        if (this.state.loadingState === "loaded") {
+            return this.renderBuilds();
+        } else if (this.state.loadingState === "error") {
+            return <div>{this.state.lastError}</div>
+        } else {
+            return <div>Loading...</div>
+        }
+    }
+
+    renderBuilds() {
         if (this.props.params && this.props.params.buildid) {
             let build = this.findBuildById(this.props.params.buildid);
 

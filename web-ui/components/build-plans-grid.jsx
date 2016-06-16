@@ -1,7 +1,9 @@
 import React from "react";
 import { Link } from "react-router";
-import {successColor, failColor, unknownColor} from "../css-js/build-colors";
+import { fromExitCode } from "../css-js/build-colors";
+import { shadow, size, cursor, withSiblings } from "../css-js/small-build-squares";
 
+var buildStyle = $.extend(shadow, size, cursor, withSiblings);
 export default function(props) {
     let buildPlans = props.buildPlans;
     if (!buildPlans || Object.keys(buildPlans).length == 0) {
@@ -55,7 +57,7 @@ function sortBuildPlans(buildPlans) {
 
 function fullWidthBuildPlan(buildPlan) {
     let mostRecentBuild = buildPlan[buildPlan.length - 1];
-    let color = mostRecentBuild.exitCode === undefined ? unknownColor : (mostRecentBuild.exitCode == 0 ? successColor : failColor);
+    let color = fromExitCode(mostRecentBuild.exitCode);
     let styles = {
         width: "100%",
         height: "350px",
@@ -78,7 +80,7 @@ function fullWidthBuildPlan(buildPlan) {
 
 function notFullWidth(buildPlan) {
     let mostRecentBuild = buildPlan[buildPlan.length - 1];
-    let color = mostRecentBuild.exitCode === undefined ? unknownColor : (mostRecentBuild.exitCode == 0 ? successColor : failColor);
+    let color = fromExitCode(mostRecentBuild.exitCode);
     let styles = {
         width: "24.28vw",
         float: "left",
@@ -115,25 +117,6 @@ function renderBuilds(builds, prefix) {
         return <div>No builds</div>
     }
 
-    let baseStyle = {
-        width: "30px",
-        height: "30px",
-        marginTop: "10px",
-
-        float: "left",
-    }
-
-    let buildStyle = $.extend({
-        WebkitBoxShadow: "1px 1px 5px 1px #555",
-        MozBoxShadow: "1px 1px 5px 1px #555",
-        BoxShadow: "1px 1px 5x 1px #555",
-        borderRadius: "3px",
-
-        marginRight: "10px",
-
-        cursor: "pointer",
-    }, baseStyle);
-
     let squares = [];
     if (prefix) {
         squares.push(<div style={baseStyle}>...</div>);
@@ -141,7 +124,7 @@ function renderBuilds(builds, prefix) {
 
     let lastBuild = builds[builds.length - 1];
     builds.map(build => {
-        let color = build.exitCode === undefined ?  "lightblue" : (build.exitCode == 0 ? "lightgreen" : "lightcoral");
+        let color = fromExitCode(build.exitCode);
 
         let localBuildStyle = JSON.parse(JSON.stringify(buildStyle)); // Hehe.. :D
         localBuildStyle.backgroundColor = color;
